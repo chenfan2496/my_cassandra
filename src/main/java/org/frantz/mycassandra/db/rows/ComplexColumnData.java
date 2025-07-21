@@ -38,4 +38,7 @@ public class ComplexColumnData implements ColumnData{
     public boolean hasCells() {
         return !cells.isEmpty();
     }
+    public NavigableMap<CellPath, Cell> getCells() {
+        return this.cells;
+    }
 }

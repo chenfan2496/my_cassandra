@@ -15,7 +15,9 @@ public class BufferCell extends AbstractCell{
     public BufferCell(ColumnMetadata column, long timestamp, ByteBuffer value) {
         this(column, timestamp, NO_TTL, NO_DELETION_TIME, value, null);
     }
-
+    public BufferCell(ColumnMetadata column, long timestamp, ByteBuffer value, CellPath homePath) {
+        this(column, timestamp, NO_TTL,NO_DELETION_TIME, value, homePath);
+    }
     public BufferCell(ColumnMetadata column, long timestamp, int ttl,
                       int localDeletionTime, ByteBuffer value) {
         this(column, timestamp, ttl, localDeletionTime, value, null);
@@ -27,6 +29,8 @@ public class BufferCell extends AbstractCell{
         this.value = Objects.requireNonNull(value);
         this.path = path != null ? path : CellPath.EMPTY;
     }
+
+
 
 
     @Override

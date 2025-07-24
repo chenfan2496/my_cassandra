@@ -10,10 +10,8 @@ import java.nio.ByteOrder;
 
 public abstract class RebufferingInputStream extends InputStream implements DataInputPlus, Closeable {
     protected ByteBuffer buffer;
-
-    protected RebufferingInputStream(ByteBuffer buffer)
-    {
-        Preconditions.checkArgument(buffer == null || buffer.order() == ByteOrder.BIG_ENDIAN, "Buffer must have BIG ENDIAN byte ordering");
+    protected RebufferingInputStream(ByteBuffer buffer) {
+        Preconditions.checkArgument(buffer == null || buffer.order() == ByteOrder.BIG_ENDIAN,"Buffer must have BIG ENDIAN byte ordering");
         this.buffer = buffer;
     }
 
@@ -49,12 +47,10 @@ public abstract class RebufferingInputStream extends InputStream implements Data
             return 0;
 
         int copied = 0;
-        while (copied < len)
-        {
+        while (copied < len) {
             int position = buffer.position();
             int remaining = buffer.limit() - position;
-            if (remaining == 0)
-            {
+            if (remaining == 0) {
                 reBuffer();
                 position = buffer.position();
                 remaining = buffer.limit() - position;

@@ -5,6 +5,7 @@ import org.frantz.mycassandra.utils.vints.VIntCoding;
 import java.io.*;
 
 public interface DataInputPlus extends DataInput {
+
     default long readVInt() throws IOException {
         return VIntCoding.readVInt(this);
     }

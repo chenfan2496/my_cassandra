@@ -1,4 +1,4 @@
-package org.frantz.mycassandra.utils.vints;
+package org.frantz.mycassandra.utils;
 
 import java.lang.reflect.Field;
 import java.nio.Buffer;

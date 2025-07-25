@@ -1,8 +1,8 @@
 package org.frantz.mycassandra.db.io.util;
 
 import net.nicoulaj.compilecommand.annotations.Inline;
-import org.frantz.mycassandra.utils.vints.FastByteOperations;
-import org.frantz.mycassandra.utils.vints.memory.MemoryUtil;
+import org.frantz.mycassandra.utils.FastByteOperations;
+import org.frantz.mycassandra.utils.memory.MemoryUtil;
 import sun.misc.Unsafe;
 import sun.nio.ch.DirectBuffer;
 

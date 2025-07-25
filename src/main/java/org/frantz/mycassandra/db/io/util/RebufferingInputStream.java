@@ -1,7 +1,7 @@
 package org.frantz.mycassandra.db.io.util;
 
 import com.google.common.base.Preconditions;
-import org.frantz.mycassandra.utils.vints.FastByteOperations;
+import org.frantz.mycassandra.utils.FastByteOperations;
 import org.frantz.mycassandra.utils.vints.VIntCoding;
 
 import java.io.*;

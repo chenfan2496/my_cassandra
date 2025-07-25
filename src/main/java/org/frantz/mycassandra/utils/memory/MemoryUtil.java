@@ -1,4 +1,4 @@
-package org.frantz.mycassandra.utils.vints.memory;
+package org.frantz.mycassandra.utils.memory;
 
 import sun.misc.Unsafe;
 

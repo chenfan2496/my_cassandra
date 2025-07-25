@@ -42,7 +42,6 @@ public class FastByteOperations {
         BestHolder.BEST.copy(src, srcPosition, trg, trgPosition, length);
     }
 
-
     public static void copy(ByteBuffer src, int srcPosition, ByteBuffer trg, int trgPosition, int length)
     {
         BestHolder.BEST.copy(src, srcPosition, trg, trgPosition, length);

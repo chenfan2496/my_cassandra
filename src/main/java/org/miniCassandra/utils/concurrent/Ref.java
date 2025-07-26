@@ -31,32 +31,17 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
-import org.apache.cassandra.concurrent.InfiniteLoopExecutor;
+import org.miniCassandra.db.io.util.Memory;
+import org.miniCassandra.db.io.util.SafeMemory;
+import org.miniCassandra.utils.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
-
-import org.apache.cassandra.concurrent.NamedThreadFactory;
-import org.apache.cassandra.db.ColumnFamilyStore;
-import org.apache.cassandra.db.Keyspace;
-import org.apache.cassandra.db.lifecycle.View;
-import org.apache.cassandra.io.sstable.format.SSTableReader;
-import org.apache.cassandra.io.util.Memory;
-import org.apache.cassandra.io.util.SafeMemory;
-import org.apache.cassandra.utils.ExecutorUtils;
-import org.apache.cassandra.utils.NoSpamLogger;
-import org.apache.cassandra.utils.Pair;
-import org.cliffc.high_scale_lib.NonBlockingHashMap;
-
 import static java.util.Collections.emptyList;
-import org.apache.cassandra.concurrent.InfiniteLoopExecutor.InterruptibleRunnable;
-
-import static org.apache.cassandra.utils.ExecutorUtils.awaitTermination;
-import static org.apache.cassandra.utils.ExecutorUtils.shutdownNow;
-import static org.apache.cassandra.utils.Throwables.maybeFail;
-import static org.apache.cassandra.utils.Throwables.merge;
+import static org.miniCassandra.utils.Throwables.maybeFail;
+import static org.miniCassandra.utils.Throwables.merge;
 
 /**
  * An object that needs ref counting does the two following:
@@ -88,22 +73,19 @@ import static org.apache.cassandra.utils.Throwables.merge;
  * Once the Ref.GlobalState has been completely released, the Tidy method is called and it removes the global reference
  * to itself so it may also be collected.
  */
-public final class Ref<T> implements RefCounted<T>
-{
+public final class Ref<T> implements RefCounted<T> {
     static final Logger logger = LoggerFactory.getLogger(Ref.class);
     public static final boolean DEBUG_ENABLED = System.getProperty("cassandra.debugrefcount", "false").equalsIgnoreCase("true");
 
     final State state;
     final T referent;
 
-    public Ref(T referent, Tidy tidy)
-    {
+    public Ref(T referent, Tidy tidy) {
         this.state = new State(new GlobalState(tidy), this, referenceQueue);
         this.referent = referent;
     }
 
-    Ref(T referent, GlobalState state)
-    {
+    Ref(T referent, GlobalState state) {
         this.state = new State(state, this, referenceQueue);
         this.referent = referent;
     }
@@ -113,39 +95,32 @@ public final class Ref<T> implements RefCounted<T>
      * Failure to abide by this contract will result in an error (eventually) being reported, assuming a
      * hard reference to the resource it managed is not leaked.
      */
-    public void release()
-    {
+    public void release() {
         state.release(false);
     }
 
-    public Throwable ensureReleased(Throwable accumulate)
-    {
+    public Throwable ensureReleased(Throwable accumulate) {
         return state.ensureReleased(accumulate);
     }
 
-    public void ensureReleased()
-    {
+    public void ensureReleased() {
         maybeFail(state.ensureReleased(null));
     }
 
-    public void close()
-    {
+    public void close() {
         ensureReleased();
     }
 
-    public T get()
-    {
+    public T get() {
         state.assertNotReleased();
         return referent;
     }
 
-    public Ref<T> tryRef()
-    {
+    public Ref<T> tryRef() {
         return state.globalState.ref() ? new Ref<>(referent, state.globalState) : null;
     }
 
-    public Ref<T> ref()
-    {
+    public Ref<T> ref() {
         Ref<T> ref = tryRef();
         // TODO: print the last release as well as the release here
         if (ref == null)
@@ -153,10 +128,8 @@ public final class Ref<T> implements RefCounted<T>
         return ref;
     }
 
-    public String printDebugInfo()
-    {
-        if (DEBUG_ENABLED)
-        {
+    public String printDebugInfo() {
+        if (DEBUG_ENABLED) {
             state.debug.log(state.toString());
             return "Memory was freed by " + state.debug.deallocateThread;
         }
@@ -165,41 +138,36 @@ public final class Ref<T> implements RefCounted<T>
 
     /**
      * A convenience method for reporting:
+     *
      * @return the number of currently extant references globally, including the shared reference
      */
-    public int globalCount()
-    {
+    public int globalCount() {
         return state.globalState.count();
     }
 
     // similar to Ref.GlobalState, but tracks only the management of each unique ref created to the managed object
     // ensures it is only released once, and that it is always released
-    static final class State extends PhantomReference<Ref>
-    {
+    static final class State extends PhantomReference<Ref> {
         final Debug debug = DEBUG_ENABLED ? new Debug() : null;
         final GlobalState globalState;
         private volatile int released;
 
         private static final AtomicIntegerFieldUpdater<State> releasedUpdater = AtomicIntegerFieldUpdater.newUpdater(State.class, "released");
 
-        public State(final GlobalState globalState, Ref reference, ReferenceQueue<? super Ref> q)
-        {
+        public State(final GlobalState globalState, Ref reference, ReferenceQueue<? super Ref> q) {
             super(reference, q);
             this.globalState = globalState;
             globalState.register(this);
         }
 
-        void assertNotReleased()
-        {
+        void assertNotReleased() {
             if (DEBUG_ENABLED && released == 1)
                 debug.log(toString());
             assert released == 0;
         }
 
-        Throwable ensureReleased(Throwable accumulate)
-        {
-            if (releasedUpdater.getAndSet(this, 1) == 0)
-            {
+        Throwable ensureReleased(Throwable accumulate) {
+            if (releasedUpdater.getAndSet(this, 1) == 0) {
                 accumulate = globalState.release(this, accumulate);
                 if (DEBUG_ENABLED)
                     debug.deallocate();
@@ -207,12 +175,9 @@ public final class Ref<T> implements RefCounted<T>
             return accumulate;
         }
 
-        void release(boolean leak)
-        {
-            if (!releasedUpdater.compareAndSet(this, 0, 1))
-            {
-                if (!leak)
-                {
+        void release(boolean leak) {
+            if (!releasedUpdater.compareAndSet(this, 0, 1)) {
+                if (!leak) {
                     String id = this.toString();
                     logger.error("BAD RELEASE: attempted to release a reference ({}) that has already been released", id);
                     if (DEBUG_ENABLED)
@@ -222,15 +187,12 @@ public final class Ref<T> implements RefCounted<T>
                 return;
             }
             Throwable fail = globalState.release(this, null);
-            if (leak)
-            {
+            if (leak) {
                 String id = this.toString();
                 logger.error("LEAK DETECTED: a reference ({}) to {} was not released before the reference was garbage collected", id, globalState);
                 if (DEBUG_ENABLED)
                     debug.log(id);
-            }
-            else if (DEBUG_ENABLED)
-            {
+            } else if (DEBUG_ENABLED) {
                 debug.deallocate();
             }
             if (fail != null)
@@ -238,37 +200,35 @@ public final class Ref<T> implements RefCounted<T>
         }
     }
 
-    static final class Debug
-    {
+    static final class Debug {
         String allocateThread, deallocateThread;
         StackTraceElement[] allocateTrace, deallocateTrace;
-        Debug()
-        {
+
+        Debug() {
             Thread thread = Thread.currentThread();
             allocateThread = thread.toString();
             allocateTrace = thread.getStackTrace();
         }
-        synchronized void deallocate()
-        {
+
+        synchronized void deallocate() {
             Thread thread = Thread.currentThread();
             deallocateThread = thread.toString();
             deallocateTrace = thread.getStackTrace();
         }
-        synchronized void log(String id)
-        {
+
+        synchronized void log(String id) {
             logger.error("Allocate trace {}:\n{}", id, print(allocateThread, allocateTrace));
             if (deallocateThread != null)
                 logger.error("Deallocate trace {}:\n{}", id, print(deallocateThread, deallocateTrace));
         }
-        String print(String thread, StackTraceElement[] trace)
-        {
+
+        String print(String thread, StackTraceElement[] trace) {
             StringBuilder sb = new StringBuilder();
             sb.append(thread);
             sb.append("\n");
-            for (StackTraceElement element : trace)
-            {
+            for (StackTraceElement element : trace) {
                 sb.append("\tat ");
-                sb.append(element );
+                sb.append(element);
                 sb.append("\n");
             }
             return sb.toString();
@@ -278,8 +238,7 @@ public final class Ref<T> implements RefCounted<T>
     // the object that manages the actual cleaning up; this does not reference the target object
     // so that we can detect when references are lost to the resource itself, and still cleanup afterwards
     // the Tidy object MUST NOT contain any references to the object we are managing
-    static final class GlobalState
-    {
+    static final class GlobalState {
         // we need to retain a reference to each of the PhantomReference instances
         // we are using to track individual refs
         private final Collection<State> locallyExtant = new ConcurrentLinkedDeque<>();
@@ -288,22 +247,18 @@ public final class Ref<T> implements RefCounted<T>
         // the object to call to cleanup when our refs are all finished with
         private final Tidy tidy;
 
-        GlobalState(Tidy tidy)
-        {
+        GlobalState(Tidy tidy) {
             this.tidy = tidy;
             globallyExtant.add(this);
         }
 
-        void register(Ref.State ref)
-        {
+        void register(Ref.State ref) {
             locallyExtant.add(ref);
         }
 
         // increment ref count if not already tidied, and return success/failure
-        boolean ref()
-        {
-            while (true)
-            {
+        boolean ref() {
+            while (true) {
                 int cur = counts.get();
                 if (cur < 0)
                     return false;
@@ -313,76 +268,66 @@ public final class Ref<T> implements RefCounted<T>
         }
 
         // release a single reference, and cleanup if no more are extant
-        Throwable release(Ref.State ref, Throwable accumulate)
-        {
+        Throwable release(Ref.State ref, Throwable accumulate) {
             locallyExtant.remove(ref);
-            if (-1 == counts.decrementAndGet())
-            {
+            if (-1 == counts.decrementAndGet()) {
                 globallyExtant.remove(this);
-                try
-                {
+                try {
                     if (tidy != null)
                         tidy.tidy();
-                }
-                catch (Throwable t)
-                {
+                } catch (Throwable t) {
                     accumulate = merge(accumulate, t);
                 }
             }
             return accumulate;
         }
 
-        int count()
-        {
+        int count() {
             return 1 + counts.get();
         }
 
-        public String toString()
-        {
+        public String toString() {
             if (tidy != null)
                 return tidy.getClass() + "@" + System.identityHashCode(tidy) + ":" + tidy.name();
             return "@" + System.identityHashCode(this);
         }
     }
 
-    private static final Class<?>[] concurrentIterableClasses = new Class<?>[] {
+    private static final Class<?>[] concurrentIterableClasses = new Class<?>[]{
             ConcurrentLinkedQueue.class,
             ConcurrentLinkedDeque.class,
             ConcurrentSkipListSet.class,
             CopyOnWriteArrayList.class,
             CopyOnWriteArraySet.class,
             DelayQueue.class,
-            NonBlockingHashMap.class,
+            //           NonBlockingHashMap.class,
     };
     static final Set<Class<?>> concurrentIterables = Collections.newSetFromMap(new IdentityHashMap<>());
     private static final Set<GlobalState> globallyExtant = Collections.newSetFromMap(new ConcurrentHashMap<>());
     static final ReferenceQueue<Object> referenceQueue = new ReferenceQueue<>();
-    private static final InfiniteLoopExecutor EXEC = new InfiniteLoopExecutor("Reference-Reaper", Ref::reapOneReference).start();
-    static final ScheduledExecutorService STRONG_LEAK_DETECTOR = !DEBUG_ENABLED ? null : Executors.newScheduledThreadPool(1, new NamedThreadFactory("Strong-Reference-Leak-Detector"));
-    static
-    {
-        if (DEBUG_ENABLED)
-        {
-            STRONG_LEAK_DETECTOR.scheduleAtFixedRate(new Visitor(), 1, 15, TimeUnit.MINUTES);
-            STRONG_LEAK_DETECTOR.scheduleAtFixedRate(new StrongLeakDetector(), 2, 15, TimeUnit.MINUTES);
-        }
-        concurrentIterables.addAll(Arrays.asList(concurrentIterableClasses));
-    }
+    //private static final InfiniteLoopExecutor EXEC = new InfiniteLoopExecutor("Reference-Reaper", Ref::reapOneReference).start();
+    // static final ScheduledExecutorService STRONG_LEAK_DETECTOR = !DEBUG_ENABLED ? null : Executors.newScheduledThreadPool(1, new NamedThreadFactory("Strong-Reference-Leak-Detector"));
+//    static
+//    {
+//        if (DEBUG_ENABLED)
+//        {
+//            STRONG_LEAK_DETECTOR.scheduleAtFixedRate(new Visitor(), 1, 15, TimeUnit.MINUTES);
+//            STRONG_LEAK_DETECTOR.scheduleAtFixedRate(new StrongLeakDetector(), 2, 15, TimeUnit.MINUTES);
+//        }
+//        concurrentIterables.addAll(Arrays.asList(concurrentIterableClasses));
+//    }
 
-    private static void reapOneReference() throws InterruptedException
-    {
+    private static void reapOneReference() throws InterruptedException {
         Object obj = referenceQueue.remove(100);
-        if (obj instanceof Ref.State)
-        {
+        if (obj instanceof Ref.State) {
             ((Ref.State) obj).release(true);
         }
     }
 
     static final Deque<InProgressVisit> inProgressVisitPool = new ArrayDeque<InProgressVisit>();
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    static InProgressVisit newInProgressVisit(Object o, List<Field> fields, Field field, String name)
-    {
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    static InProgressVisit newInProgressVisit(Object o, List<Field> fields, Field field, String name) {
         Preconditions.checkNotNull(o);
         InProgressVisit ipv = inProgressVisitPool.pollLast();
         if (ipv == null)
@@ -390,14 +335,12 @@ public final class Ref<T> implements RefCounted<T>
 
         ipv.o = o;
         if (o instanceof Object[])
-            ipv.collectionIterator = Arrays.asList((Object[])o).iterator();
-        else if (o instanceof ConcurrentMap)
-        {
+            ipv.collectionIterator = Arrays.asList((Object[]) o).iterator();
+        else if (o instanceof ConcurrentMap) {
             ipv.isMapIterator = true;
-            ipv.collectionIterator = ((Map)o).entrySet().iterator();
-        }
-        else if (concurrentIterables.contains(o.getClass()) | o instanceof BlockingQueue)
-            ipv.collectionIterator = ((Iterable)o).iterator();
+            ipv.collectionIterator = ((Map) o).entrySet().iterator();
+        } else if (concurrentIterables.contains(o.getClass()) | o instanceof BlockingQueue)
+            ipv.collectionIterator = ((Iterable) o).iterator();
 
         ipv.fields = fields;
         ipv.field = field;
@@ -405,8 +348,7 @@ public final class Ref<T> implements RefCounted<T>
         return ipv;
     }
 
-    static void returnInProgressVisit(InProgressVisit ipv)
-    {
+    static void returnInProgressVisit(InProgressVisit ipv) {
         if (inProgressVisitPool.size() > 1024)
             return;
         ipv.name = null;
@@ -424,9 +366,8 @@ public final class Ref<T> implements RefCounted<T>
      * Stack state for walking an object graph.
      * Field index is the index of the current field being fetched.
      */
-    @SuppressWarnings({ "rawtypes"})
-    static class InProgressVisit
-    {
+    @SuppressWarnings({"rawtypes"})
+    static class InProgressVisit {
         String name;
         List<Field> fields;
         Object o;
@@ -441,8 +382,7 @@ public final class Ref<T> implements RefCounted<T>
         //And the associated value is stashed here and returned next
         Object mapEntryValue;
 
-        private Field nextField()
-        {
+        private Field nextField() {
             if (fields.isEmpty())
                 return null;
 
@@ -454,45 +394,38 @@ public final class Ref<T> implements RefCounted<T>
             return retval;
         }
 
-        Pair<Object, Field> nextChild() throws IllegalAccessException
-        {
+        Pair<Object, Field> nextChild() throws IllegalAccessException {
             //If the last child returned was a key from a map, the value from that entry is stashed
             //so it can be returned next
-            if (mapEntryValue != null)
-            {
+            if (mapEntryValue != null) {
                 Pair<Object, Field> retval = Pair.create(mapEntryValue, field);
                 mapEntryValue = null;
                 return retval;
             }
 
             //If o is a ConcurrentMap, BlockingQueue, or Object[], then an iterator will be stored to return the elements
-            if (collectionIterator != null)
-            {
+            if (collectionIterator != null) {
                 if (!collectionIterator.hasNext())
                     return null;
                 Object nextItem = null;
                 //Find the next non-null element to traverse since returning null will cause the visitor to stop
-                while (collectionIterator.hasNext() && (nextItem = collectionIterator.next()) == null){}
-                if (nextItem != null)
-                {
-                    if (isMapIterator & nextItem instanceof Map.Entry)
-                    {
-                        Map.Entry entry = (Map.Entry)nextItem;
+                while (collectionIterator.hasNext() && (nextItem = collectionIterator.next()) == null) {
+                }
+                if (nextItem != null) {
+                    if (isMapIterator & nextItem instanceof Map.Entry) {
+                        Map.Entry entry = (Map.Entry) nextItem;
                         mapEntryValue = entry.getValue();
                         return Pair.create(entry.getKey(), field);
                     }
                     return Pair.create(nextItem, field);
-                }
-                else
-                {
+                } else {
                     return null;
                 }
             }
 
             //Basic traversal of an object by its member fields
             //Don't return null values as that indicates no more objects
-            while (true)
-            {
+            while (true) {
                 Field nextField = nextField();
                 if (nextField == null)
                     return null;
@@ -510,14 +443,12 @@ public final class Ref<T> implements RefCounted<T>
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             return field == null ? name : field.toString() + "-" + o.getClass().getName();
         }
     }
 
-    static class Visitor implements Runnable
-    {
+    static class Visitor implements Runnable {
         final Deque<InProgressVisit> path = new ArrayDeque<>();
         final Set<Object> visited = Collections.newSetFromMap(new IdentityHashMap<>());
         @VisibleForTesting
@@ -527,12 +458,9 @@ public final class Ref<T> implements RefCounted<T>
         GlobalState visiting;
         Set<GlobalState> haveLoops;
 
-        public void run()
-        {
-            try
-            {
-                for (GlobalState globalState : globallyExtant)
-                {
+        public void run() {
+            try {
+                for (GlobalState globalState : globallyExtant) {
                     if (globalState.tidy == null)
                         continue;
 
@@ -545,13 +473,9 @@ public final class Ref<T> implements RefCounted<T>
                     visiting = globalState;
                     traverse(globalState.tidy);
                 }
-            }
-            catch (Throwable t)
-            {
+            } catch (Throwable t) {
                 t.printStackTrace();
-            }
-            finally
-            {
+            } finally {
                 lastVisitedCount = visited.size();
                 path.clear();
                 visited.clear();
@@ -561,74 +485,62 @@ public final class Ref<T> implements RefCounted<T>
         /*
          * Searches for an indirect strong reference between rootObject and visiting.
          */
-        void traverse(final RefCounted.Tidy rootObject)
-        {
+        void traverse(final RefCounted.Tidy rootObject) {
             path.offer(newInProgressVisit(rootObject, getFields(rootObject.getClass()), null, rootObject.name()));
 
             InProgressVisit inProgress = null;
-            while (inProgress != null || !path.isEmpty())
-            {
+            while (inProgress != null || !path.isEmpty()) {
                 //If necessary fetch the next object to start tracing
                 if (inProgress == null)
                     inProgress = path.pollLast();
 
-                try
-                {
+                try {
                     Pair<Object, Field> p = inProgress.nextChild();
                     Object child = null;
                     Field field = null;
 
-                    if (p != null)
-                    {
+                    if (p != null) {
                         iterations++;
                         child = p.left;
                         field = p.right;
                     }
 
-                    if (child != null && visited.add(child))
-                    {
+                    if (child != null && visited.add(child)) {
                         path.offer(inProgress);
                         inProgress = newInProgressVisit(child, getFields(child.getClass()), field, null);
                         continue;
-                    }
-                    else if (visiting == child)
-                    {
+                    } else if (visiting == child) {
                         if (haveLoops != null)
                             haveLoops.add(visiting);
-                        NoSpamLogger.log(logger,
-                                NoSpamLogger.Level.ERROR,
-                                rootObject.getClass().getName(),
-                                1,
-                                TimeUnit.SECONDS,
-                                "Strong self-ref loop detected {}",
-                                path);
-                    }
-                    else if (child == null)
-                    {
+//                        NoSpamLogger.log(logger,
+//                                NoSpamLogger.Level.ERROR,
+//                                rootObject.getClass().getName(),
+//                                1,
+//                                TimeUnit.SECONDS,
+//                                "Strong self-ref loop detected {}",
+//                                path);
+                    } else if (child == null) {
                         returnInProgressVisit(inProgress);
                         inProgress = null;
                         continue;
                     }
-                }
-                catch (IllegalAccessException e)
-                {
-                    NoSpamLogger.log(logger, NoSpamLogger.Level.ERROR, 5, TimeUnit.MINUTES, "Could not fully check for self-referential leaks", e);
+                } catch (IllegalAccessException e) {
+                    // NoSpamLogger.log(logger, NoSpamLogger.Level.ERROR, 5, TimeUnit.MINUTES, "Could not fully check for self-referential leaks", e);
                 }
             }
         }
     }
 
     static final Map<Class<?>, List<Field>> fieldMap = new HashMap<>();
-    static List<Field> getFields(Class<?> clazz)
-    {
+
+    static List<Field> getFields(Class<?> clazz) {
         if (clazz == null || clazz == PhantomReference.class || clazz == Class.class || java.lang.reflect.Member.class.isAssignableFrom(clazz))
             return emptyList();
         List<Field> fields = fieldMap.get(clazz);
         if (fields != null)
             return fields;
         fieldMap.put(clazz, fields = new ArrayList<>());
-        for (Field field : clazz.getDeclaredFields())
-        {
+        for (Field field : clazz.getDeclaredFields()) {
             if (field.getType().isPrimitive() || Modifier.isStatic(field.getModifiers()))
                 continue;
             field.setAccessible(true);
@@ -638,77 +550,75 @@ public final class Ref<T> implements RefCounted<T>
         return fields;
     }
 
-    public static class IdentityCollection
-    {
+    public static class IdentityCollection {
         final Set<Tidy> candidates;
-        public IdentityCollection(Set<Tidy> candidates)
-        {
+
+        public IdentityCollection(Set<Tidy> candidates) {
             this.candidates = candidates;
         }
 
-        public void add(Ref<?> ref)
-        {
+        public void add(Ref<?> ref) {
             candidates.remove(ref.state.globalState.tidy);
         }
-        public void add(SelfRefCounted<?> ref)
-        {
+
+        public void add(SelfRefCounted<?> ref) {
             add(ref.selfRef());
         }
-        public void add(SharedCloseable ref)
-        {
+
+        public void add(SharedCloseable ref) {
             if (ref instanceof SharedCloseableImpl)
-                add((SharedCloseableImpl)ref);
+                add((SharedCloseableImpl) ref);
         }
-        public void add(SharedCloseableImpl ref)
-        {
+
+        public void add(SharedCloseableImpl ref) {
             add(ref.ref);
         }
-        public void add(Memory memory)
-        {
+
+        public void add(Memory memory) {
             if (memory instanceof SafeMemory)
                 ((SafeMemory) memory).addTo(this);
         }
     }
 
-    private static class StrongLeakDetector implements Runnable
-    {
-        Set<Tidy> candidates = new HashSet<>();
+//    private static class StrongLeakDetector implements Runnable
+//    {
+//        Set<Tidy> candidates = new HashSet<>();
+//
+//        public void run()
+//        {
+//            final Set<Tidy> candidates = Collections.newSetFromMap(new IdentityHashMap<>());
+//            for (GlobalState state : globallyExtant)
+//                candidates.add(state.tidy);
+//            removeExpected(candidates);
+//            this.candidates.retainAll(candidates);
+//            if (!this.candidates.isEmpty())
+//            {
+//                List<String> names = new ArrayList<>();
+//                for (Tidy tidy : this.candidates)
+//                    names.add(tidy.name());
+//                logger.warn("Strong reference leak candidates detected: {}", names);
+//            }
+//            this.candidates = candidates;
+//        }
+//
+//        private void removeExpected(Set<Tidy> candidates)
+//        {
+//            final Ref.IdentityCollection expected = new Ref.IdentityCollection(candidates);
+//            for (Keyspace ks : Keyspace.all())
+//            {
+//                for (ColumnFamilyStore cfs : ks.getColumnFamilyStores())
+//                {
+//                    View view = cfs.getTracker().getView();
+//                    for (SSTableReader reader : view.allKnownSSTables())
+//                        reader.addTo(expected);
+//                }
+//            }
+//        }
 
-        public void run()
-        {
-            final Set<Tidy> candidates = Collections.newSetFromMap(new IdentityHashMap<>());
-            for (GlobalState state : globallyExtant)
-                candidates.add(state.tidy);
-            removeExpected(candidates);
-            this.candidates.retainAll(candidates);
-            if (!this.candidates.isEmpty())
-            {
-                List<String> names = new ArrayList<>();
-                for (Tidy tidy : this.candidates)
-                    names.add(tidy.name());
-                logger.warn("Strong reference leak candidates detected: {}", names);
-            }
-            this.candidates = candidates;
-        }
+//    @VisibleForTesting
+//    public static void shutdownReferenceReaper(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException
+//    {
+//        ExecutorUtils.shutdownNowAndWait(timeout, unit, EXEC, STRONG_LEAK_DETECTOR);
+//    }
 
-        private void removeExpected(Set<Tidy> candidates)
-        {
-            final Ref.IdentityCollection expected = new Ref.IdentityCollection(candidates);
-            for (Keyspace ks : Keyspace.all())
-            {
-                for (ColumnFamilyStore cfs : ks.getColumnFamilyStores())
-                {
-                    View view = cfs.getTracker().getView();
-                    for (SSTableReader reader : view.allKnownSSTables())
-                        reader.addTo(expected);
-                }
-            }
-        }
-    }
-
-    @VisibleForTesting
-    public static void shutdownReferenceReaper(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException
-    {
-        ExecutorUtils.shutdownNowAndWait(timeout, unit, EXEC, STRONG_LEAK_DETECTOR);
-    }
 }

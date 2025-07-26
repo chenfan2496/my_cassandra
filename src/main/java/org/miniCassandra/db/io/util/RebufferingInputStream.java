@@ -8,6 +8,9 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+/**
+ * 持有ByteBuffer 拥有将数据读取到字节缓冲区的能力
+ */
 public abstract class RebufferingInputStream extends InputStream implements DataInputPlus, Closeable {
     protected ByteBuffer buffer;
     protected RebufferingInputStream(ByteBuffer buffer) {

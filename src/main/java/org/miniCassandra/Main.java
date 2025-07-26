@@ -1,7 +1,6 @@
 package org.miniCassandra;
 
 import org.miniCassandra.db.cql.ColumnMetadata;
-import org.frantz.mycassandra.db.rows.*;
 import org.miniCassandra.db.rows.*;
 
 import java.nio.ByteBuffer;

@@ -4,6 +4,9 @@ import org.miniCassandra.utils.vints.VIntCoding;
 
 import java.io.*;
 
+/**
+ * 继承jdk DataInput接口 扩展增强读取变长整形数据能力
+ */
 public interface DataInputPlus extends DataInput {
 
     default long readVInt() throws IOException {

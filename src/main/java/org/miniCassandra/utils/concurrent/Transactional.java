@@ -18,8 +18,9 @@
 */
 package org.miniCassandra.utils.concurrent;
 
-import static org.apache.cassandra.utils.Throwables.maybeFail;
-import static org.apache.cassandra.utils.Throwables.merge;
+
+import static org.miniCassandra.utils.Throwables.maybeFail;
+import static org.miniCassandra.utils.Throwables.merge;
 
 /**
  * An abstraction for Transactional behaviour. An object implementing this interface has a lifetime

@@ -15,6 +15,16 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.14.0</version> <!-- 2023年12月发布 -->
+        </dependency>
+        <dependency>
+            <groupId>com.github.jbellis</groupId>
+            <artifactId>jamm</artifactId>
+            <version>0.4.0</version>
+        </dependency>
         <!-- 旧版 groupId（Metrics 3.x） -->
         <dependency>
             <groupId>com.codahale.metrics</groupId>

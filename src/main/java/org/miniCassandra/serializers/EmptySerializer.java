@@ -26,18 +26,18 @@ import java.nio.ByteBuffer;
 public class EmptySerializer implements TypeSerializer<Void>
 {
     public static final EmptySerializer instance = new EmptySerializer();
-
+    @Override
     public Void deserialize(ByteBuffer bytes)
     {
         validate(bytes);
         return null;
     }
-
+    @Override
     public ByteBuffer serialize(Void value)
     {
         return ByteBufferUtil.EMPTY_BYTE_BUFFER;
     }
-
+    @Override
     public void validate(ByteBuffer bytes) throws MarshalException
     {
         if (bytes.remaining() > 0)
@@ -47,12 +47,12 @@ public class EmptySerializer implements TypeSerializer<Void>
                                        "See CASSANDRA-15778 for details.");
         }
     }
-
+    @Override
     public String toString(Void value)
     {
         return "";
     }
-
+    @Override
     public Class<Void> getType()
     {
         return Void.class;

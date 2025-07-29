@@ -26,29 +26,29 @@ import java.nio.ByteBuffer;
 public class BytesSerializer implements TypeSerializer<ByteBuffer>
 {
     public static final BytesSerializer instance = new BytesSerializer();
-
+    @Override
     public ByteBuffer serialize(ByteBuffer bytes)
     {
         // We make a copy in case the user modifies the input
         return bytes.duplicate();
     }
-
+    @Override
     public ByteBuffer deserialize(ByteBuffer value)
     {
         // This is from the DB, so it is not shared with someone else
         return value;
     }
-
+    @Override
     public void validate(ByteBuffer bytes) throws MarshalException
     {
         // all bytes are legal.
     }
-
+    @Override
     public String toString(ByteBuffer value)
     {
         return ByteBufferUtil.bytesToHex(value);
     }
-
+    @Override
     public Class<ByteBuffer> getType()
     {
         return ByteBuffer.class;

@@ -54,7 +54,7 @@ public class MapSerializer<K, V> extends CollectionSerializer<Map<K, V>>
         this.values = values;
         this.comparator = (p1, p2) -> comparator.compare(p1.left, p2.left);
     }
-
+    @Override
     public List<ByteBuffer> serializeValues(Map<K, V> map)
     {
         List<Pair<ByteBuffer, ByteBuffer>> pairs = new ArrayList<>(map.size());
@@ -69,12 +69,12 @@ public class MapSerializer<K, V> extends CollectionSerializer<Map<K, V>>
         }
         return buffers;
     }
-
+    @Override
     public int getElementCount(Map<K, V> value)
     {
         return value.size();
     }
-
+    @Override
     public void validateForNativeProtocol(ByteBuffer bytes, int version)
     {
         try
@@ -98,7 +98,7 @@ public class MapSerializer<K, V> extends CollectionSerializer<Map<K, V>>
             throw new MarshalException("Not enough bytes to read a map");
         }
     }
-
+    @Override
     public Map<K, V> deserializeForNativeProtocol(ByteBuffer bytes, int version)
     {
         try
@@ -165,7 +165,7 @@ public class MapSerializer<K, V> extends CollectionSerializer<Map<K, V>>
             throw new MarshalException("Not enough bytes to read a map");
         }
     }
-
+    @Override
     public String toString(Map<K, V> value)
     {
         StringBuilder sb = new StringBuilder();
@@ -184,7 +184,7 @@ public class MapSerializer<K, V> extends CollectionSerializer<Map<K, V>>
         sb.append('}');
         return sb.toString();
     }
-
+    @Override
     public Class<Map<K, V>> getType()
     {
         return (Class)Map.class;

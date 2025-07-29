@@ -41,12 +41,12 @@ public class SimpleDateSerializer implements TypeSerializer<Integer>
 
     private static final Pattern rawPattern = Pattern.compile("^-?\\d+$");
     public static final SimpleDateSerializer instance = new SimpleDateSerializer();
-
+    @Override
     public Integer deserialize(ByteBuffer bytes)
     {
         return bytes.remaining() == 0 ? null : ByteBufferUtil.toInt(bytes);
     }
-
+    @Override
     public ByteBuffer serialize(Integer value)
     {
         return value == null ? ByteBufferUtil.EMPTY_BYTE_BUFFER : ByteBufferUtil.bytes(value);
@@ -105,13 +105,13 @@ public class SimpleDateSerializer implements TypeSerializer<Integer>
     {
         return TimeUnit.DAYS.toMillis(days - Integer.MIN_VALUE);
     }
-
+    @Override
     public void validate(ByteBuffer bytes) throws MarshalException
     {
         if (bytes.remaining() != 4)
             throw new MarshalException(String.format("Expected 4 byte long for date (%d)", bytes.remaining()));
     }
-
+    @Override
     public String toString(Integer value)
     {
         if (value == null)
@@ -119,7 +119,7 @@ public class SimpleDateSerializer implements TypeSerializer<Integer>
 
         return formatter.print(new LocalDate(dayToTimeInMillis(value), DateTimeZone.UTC));
     }
-
+    @Override
     public Class<Integer> getType()
     {
         return Integer.class;

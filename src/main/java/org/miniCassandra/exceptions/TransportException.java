@@ -15,28 +15,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.miniCassandra.serializers;
+package org.miniCassandra.exceptions;
 
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-
-public class AsciiSerializer extends AbstractTextSerializer
+public interface TransportException
 {
-    public static final AsciiSerializer instance = new AsciiSerializer();
+    /**
+     * The exception code.
+     */
+    public ExceptionCode code();
 
-    private AsciiSerializer()
-    {
-        super(StandardCharsets.US_ASCII);
-    }
-    @Override
-    public void validate(ByteBuffer bytes) throws MarshalException
-    {
-        // 0-127
-        for (int i = bytes.position(); i < bytes.limit(); i++)
-        {
-            byte b = bytes.get(i);
-            if (b < 0 || b > 127)
-                throw new MarshalException("Invalid byte for ascii: " + Byte.toString(b));
-        }
-    }
+    /**
+     * The exception message.
+     */
+    public String getMessage();
 }

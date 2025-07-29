@@ -28,12 +28,12 @@ public class TimeSerializer implements TypeSerializer<Long>
 {
     public static final Pattern timePattern = Pattern.compile("^-?\\d+$");
     public static final TimeSerializer instance = new TimeSerializer();
-
+    @Override
     public Long deserialize(ByteBuffer bytes)
     {
         return bytes.remaining() == 0 ? null : ByteBufferUtil.toLong(bytes);
     }
-
+    @Override
     public ByteBuffer serialize(Long value)
     {
         return value == null ? ByteBufferUtil.EMPTY_BYTE_BUFFER : ByteBufferUtil.bytes(value);
@@ -67,13 +67,13 @@ public class TimeSerializer implements TypeSerializer<Long>
             throw new MarshalException(String.format("(TimeType) Unable to coerce '%s' to a formatted time (long)", source), e1);
         }
     }
-
+    @Override
     public void validate(ByteBuffer bytes) throws MarshalException
     {
         if (bytes.remaining() != 8)
             throw new MarshalException(String.format("Expected 8 byte long for time (%d)", bytes.remaining()));
     }
-
+    @Override
     public String toString(Long value)
     {
         if (value == null)
@@ -121,7 +121,7 @@ public class TimeSerializer implements TypeSerializer<Long>
         }
         sb.append(value);
     }
-
+    @Override
     public Class<Long> getType()
     {
         return Long.class;

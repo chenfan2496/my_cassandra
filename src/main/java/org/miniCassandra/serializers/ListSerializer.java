@@ -47,7 +47,7 @@ public class ListSerializer<T> extends CollectionSerializer<List<T>>
     {
         this.elements = elements;
     }
-
+    @Override
     public List<ByteBuffer> serializeValues(List<T> values)
     {
         List<ByteBuffer> buffers = new ArrayList<>(values.size());
@@ -55,12 +55,12 @@ public class ListSerializer<T> extends CollectionSerializer<List<T>>
             buffers.add(elements.serialize(value));
         return buffers;
     }
-
+    @Override
     public int getElementCount(List<T> value)
     {
         return value.size();
     }
-
+    @Override
     public void validateForNativeProtocol(ByteBuffer bytes, int version)
     {
         try
@@ -78,7 +78,7 @@ public class ListSerializer<T> extends CollectionSerializer<List<T>>
             throw new MarshalException("Not enough bytes to read a list");
         }
     }
-
+    @Override
     public List<T> deserializeForNativeProtocol(ByteBuffer bytes, int version)
     {
         try
@@ -147,7 +147,7 @@ public class ListSerializer<T> extends CollectionSerializer<List<T>>
             throw new MarshalException("Not enough bytes to read a list");
         }
     }
-
+    @Override
     public String toString(List<T> value)
     {
         StringBuilder sb = new StringBuilder();
@@ -164,7 +164,7 @@ public class ListSerializer<T> extends CollectionSerializer<List<T>>
         sb.append(']');
         return sb.toString();
     }
-
+    @Override
     public Class<List<T>> getType()
     {
         return (Class) List.class;

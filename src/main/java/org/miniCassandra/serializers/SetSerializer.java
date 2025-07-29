@@ -46,7 +46,7 @@ public class SetSerializer<T> extends CollectionSerializer<Set<T>>
         this.elements = elements;
         this.comparator = comparator;
     }
-
+    @Override
     public List<ByteBuffer> serializeValues(Set<T> values)
     {
         List<ByteBuffer> buffers = new ArrayList<>(values.size());
@@ -55,12 +55,12 @@ public class SetSerializer<T> extends CollectionSerializer<Set<T>>
         Collections.sort(buffers, comparator);
         return buffers;
     }
-
+    @Override
     public int getElementCount(Set<T> value)
     {
         return value.size();
     }
-
+    @Override
     public void validateForNativeProtocol(ByteBuffer bytes, int version)
     {
         try
@@ -81,7 +81,7 @@ public class SetSerializer<T> extends CollectionSerializer<Set<T>>
             throw new MarshalException("Not enough bytes to read a set");
         }
     }
-
+    @Override
     public Set<T> deserializeForNativeProtocol(ByteBuffer bytes, int version)
     {
         try
@@ -113,7 +113,7 @@ public class SetSerializer<T> extends CollectionSerializer<Set<T>>
             throw new MarshalException("Not enough bytes to read a set");
         }
     }
-
+    @Override
     public String toString(Set<T> value)
     {
         StringBuilder sb = new StringBuilder();
@@ -134,7 +134,7 @@ public class SetSerializer<T> extends CollectionSerializer<Set<T>>
         sb.append('}');
         return sb.toString();
     }
-
+    @Override
     public Class<Set<T>> getType()
     {
         return (Class) Set.class;

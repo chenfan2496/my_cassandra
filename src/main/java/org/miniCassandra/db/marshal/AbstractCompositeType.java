@@ -22,10 +22,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.cassandra.cql3.Term;
-import org.apache.cassandra.serializers.TypeSerializer;
-import org.apache.cassandra.serializers.BytesSerializer;
-import org.apache.cassandra.serializers.MarshalException;
 import org.miniCassandra.utils.ByteBufferUtil;
 
 /**

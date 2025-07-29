@@ -17,11 +17,17 @@
  */
 package org.miniCassandra.db;
 
+import org.miniCassandra.db.io.util.DataOutputPlus;
+import org.miniCassandra.dht.IPartitioner;
+import org.miniCassandra.dht.IPartitionerDependentSerializer;
+import org.miniCassandra.dht.RingPosition;
+import org.miniCassandra.dht.Token;
+import org.miniCassandra.utils.ByteBufferUtil;
+
 import java.io.DataInput;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.apache.cassandra.dht.*;
 
 
 public interface PartitionPosition extends RingPosition<PartitionPosition>
@@ -75,7 +81,7 @@ public interface PartitionPosition extends RingPosition<PartitionPosition>
             else
                 Token.serializer.serialize(pos.getToken(), out, version);
         }
-
+        @Override
         public PartitionPosition deserialize(DataInput in, IPartitioner p, int version) throws IOException
         {
             Kind kind = Kind.fromOrdinal(in.readByte());
@@ -90,7 +96,7 @@ public interface PartitionPosition extends RingPosition<PartitionPosition>
                 return kind == Kind.MIN_BOUND ? t.minKeyBound() : t.maxKeyBound();
             }
         }
-
+        @Override
         public long serializedSize(PartitionPosition pos, int version)
         {
             Kind kind = pos.kind();

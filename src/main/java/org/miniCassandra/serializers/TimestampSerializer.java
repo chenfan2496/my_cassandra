@@ -122,12 +122,12 @@ public class TimestampSerializer implements TypeSerializer<Date>
 
     
     public static final TimestampSerializer instance = new TimestampSerializer();
-
+    @Override
     public Date deserialize(ByteBuffer bytes)
     {
         return bytes.remaining() == 0 ? null : new Date(ByteBufferUtil.toLong(bytes));
     }
-
+    @Override
     public ByteBuffer serialize(Date value)
     {
         return value == null ? ByteBufferUtil.EMPTY_BYTE_BUFFER : ByteBufferUtil.bytes(value.getTime());
@@ -166,13 +166,13 @@ public class TimestampSerializer implements TypeSerializer<Date>
     {
     	return FORMATTER_TO_JSON.get();
     }
-
+    @Override
     public void validate(ByteBuffer bytes) throws MarshalException
     {
         if (bytes.remaining() != 8 && bytes.remaining() != 0)
             throw new MarshalException(String.format("Expected 8 or 0 byte long for date (%d)", bytes.remaining()));
     }
-
+    @Override
     public String toString(Date value)
     {
         return value == null ? "" : FORMATTER.get().format(value);
@@ -182,7 +182,7 @@ public class TimestampSerializer implements TypeSerializer<Date>
     {
         return value == null ? "" : FORMATTER_UTC.get().format(value);
     }
-
+    @Override
     public Class<Date> getType()
     {
         return Date.class;

@@ -28,7 +28,7 @@ import java.nio.ByteBuffer;
 public class InetAddressSerializer implements TypeSerializer<InetAddress>
 {
     public static final InetAddressSerializer instance = new InetAddressSerializer();
-
+    @Override
     public InetAddress deserialize(ByteBuffer bytes)
     {
         if (bytes.remaining() == 0)
@@ -43,12 +43,12 @@ public class InetAddressSerializer implements TypeSerializer<InetAddress>
             throw new AssertionError(e);
         }
     }
-
+    @Override
     public ByteBuffer serialize(InetAddress value)
     {
         return value == null ? ByteBufferUtil.EMPTY_BYTE_BUFFER : ByteBuffer.wrap(value.getAddress());
     }
-
+    @Override
     public void validate(ByteBuffer bytes) throws MarshalException
     {
         if (bytes.remaining() == 0)
@@ -63,12 +63,12 @@ public class InetAddressSerializer implements TypeSerializer<InetAddress>
             throw new MarshalException(String.format("Expected 4 or 16 byte inetaddress; got %s", ByteBufferUtil.bytesToHex(bytes)));
         }
     }
-
+    @Override
     public String toString(InetAddress value)
     {
         return value == null ? "" : value.getHostAddress();
     }
-
+    @Override
     public Class<InetAddress> getType()
     {
         return InetAddress.class;

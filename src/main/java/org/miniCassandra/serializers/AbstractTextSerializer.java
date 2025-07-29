@@ -34,6 +34,7 @@ public abstract class AbstractTextSerializer implements TypeSerializer<String>
         this.charset = charset;
     }
 
+    @Override
     public String deserialize(ByteBuffer bytes)
     {
         try
@@ -45,17 +46,17 @@ public abstract class AbstractTextSerializer implements TypeSerializer<String>
             throw new MarshalException("Invalid " + charset + " bytes " + ByteBufferUtil.bytesToHex(bytes));
         }
     }
-
+    @Override
     public ByteBuffer serialize(String value)
     {
         return ByteBufferUtil.bytes(value, charset);
     }
-
+    @Override
     public String toString(String value)
     {
         return value;
     }
-
+    @Override
     public Class<String> getType()
     {
         return String.class;

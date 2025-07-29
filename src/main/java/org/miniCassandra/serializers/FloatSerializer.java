@@ -26,7 +26,7 @@ import java.nio.ByteBuffer;
 public class FloatSerializer implements TypeSerializer<Float>
 {
     public static final FloatSerializer instance = new FloatSerializer();
-
+    @Override
     public Float deserialize(ByteBuffer bytes)
     {
         if (bytes.remaining() == 0)
@@ -34,23 +34,23 @@ public class FloatSerializer implements TypeSerializer<Float>
 
         return ByteBufferUtil.toFloat(bytes);
     }
-
+    @Override
     public ByteBuffer serialize(Float value)
     {
         return (value == null) ? ByteBufferUtil.EMPTY_BYTE_BUFFER : ByteBufferUtil.bytes(value);
     }
-
+    @Override
     public void validate(ByteBuffer bytes) throws MarshalException
     {
         if (bytes.remaining() != 4 && bytes.remaining() != 0)
             throw new MarshalException(String.format("Expected 4 or 0 byte value for a float (%d)", bytes.remaining()));
     }
-
+    @Override
     public String toString(Float value)
     {
         return value == null ? "" : String.valueOf(value);
     }
-
+    @Override
     public Class<Float> getType()
     {
         return Float.class;

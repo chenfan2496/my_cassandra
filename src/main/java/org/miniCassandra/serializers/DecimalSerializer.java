@@ -27,7 +27,7 @@ import java.nio.ByteBuffer;
 public class DecimalSerializer implements TypeSerializer<BigDecimal>
 {
     public static final DecimalSerializer instance = new DecimalSerializer();
-
+    @Override
     public BigDecimal deserialize(ByteBuffer bytes)
     {
         if (bytes == null || bytes.remaining() == 0)
@@ -42,7 +42,7 @@ public class DecimalSerializer implements TypeSerializer<BigDecimal>
         BigInteger bi = new BigInteger(bibytes);
         return new BigDecimal(bi, scale);
     }
-
+    @Override
     public ByteBuffer serialize(BigDecimal value)
     {
         if (value == null)
@@ -58,19 +58,19 @@ public class DecimalSerializer implements TypeSerializer<BigDecimal>
         bytes.rewind();
         return bytes;
     }
-
+    @Override
     public void validate(ByteBuffer bytes) throws MarshalException
     {
         // We at least store the scale.
         if (bytes.remaining() != 0 && bytes.remaining() < 4)
             throw new MarshalException(String.format("Expected 0 or at least 4 bytes (%d)", bytes.remaining()));
     }
-
+    @Override
     public String toString(BigDecimal value)
     {
         return value == null ? "" : value.toString();
     }
-
+    @Override
     public Class<BigDecimal> getType()
     {
         return BigDecimal.class;

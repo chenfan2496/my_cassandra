@@ -34,14 +34,14 @@ public abstract class CollectionSerializer<T> implements TypeSerializer<T>
 
     public abstract T deserializeForNativeProtocol(ByteBuffer buffer, int version);
     public abstract void validateForNativeProtocol(ByteBuffer buffer, int version);
-
+    @Override
     public ByteBuffer serialize(T value)
     {
         List<ByteBuffer> values = serializeValues(value);
         // See deserialize() for why using the protocol v3 variant is the right thing to do.
         return pack(values, getElementCount(value), Server.VERSION_3);
     }
-
+    @Override
     public T deserialize(ByteBuffer bytes)
     {
         // The only cases we serialize/deserialize collections internally (i.e. not for the protocol sake),
@@ -51,7 +51,7 @@ public abstract class CollectionSerializer<T> implements TypeSerializer<T>
         // In both case, using the protocol 3 version variant is the right thing to do.
         return deserializeForNativeProtocol(bytes, Server.VERSION_3);
     }
-
+    @Override
     public void validate(ByteBuffer bytes) throws MarshalException
     {
         // Same thing as above

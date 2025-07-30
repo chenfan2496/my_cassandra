@@ -1,53 +1,157 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.miniCassandra.db.rows;
 
+import org.miniCassandra.db.io.util.DataInputPlus;
+import org.miniCassandra.db.io.util.DataOutputPlus;
+import org.miniCassandra.utils.ByteBufferUtil;
+import org.miniCassandra.utils.ObjectSizes;
+import org.miniCassandra.utils.memory.AbstractAllocator;
+
+import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.security.MessageDigest;
+import java.util.Objects;
 
-public class CellPath {
-    public static final CellPath EMPTY = new CellPath(Collections.emptyList());
 
-    private final List<ByteBuffer> pathComponents;
+/**
+ * A path for a cell belonging to a complex column type (non-frozen collection or UDT).
+ */
+public abstract class CellPath
+{
+    public static final CellPath BOTTOM = new EmptyCellPath();
+    public static final CellPath TOP = new EmptyCellPath();
 
-    public CellPath(List<ByteBuffer> pathComponents) {
-        this.pathComponents = Collections.unmodifiableList(
-                new ArrayList<>(pathComponents));
+    public abstract int size();
+    public abstract ByteBuffer get(int i);
+
+    // The only complex we currently have are collections that have only one value.
+    public static CellPath create(ByteBuffer value)
+    {
+        assert value != null;
+        return new CollectionCellPath(value);
     }
 
-    public int size() {
+    public int dataSize()
+    {
         int size = 0;
-        for (ByteBuffer component : pathComponents) {
-            size += 4; // 每个组件的长度前缀
-            size += component.remaining();
-        }
+        for (int i = 0; i < size(); i++)
+            size += get(i).remaining();
         return size;
     }
 
-    public List<ByteBuffer> getComponents() {
-        return pathComponents;
+    public void digest(MessageDigest digest)
+    {
+        for (int i = 0; i < size(); i++)
+            digest.update(get(i).duplicate());
     }
 
-    // ======================= CellPath 比较器 =======================
-    private static class CellPathComparator implements Comparator<CellPath> {
-        static final CellPathComparator INSTANCE = new CellPathComparator();
+    public abstract CellPath copy(AbstractAllocator allocator);
 
-        @Override
-        public int compare(CellPath p1, CellPath p2) {
-            if (p1 == CellPath.EMPTY && p2 == CellPath.EMPTY) return 0;
-            if (p1 == CellPath.EMPTY) return -1;
-            if (p2 == CellPath.EMPTY) return 1;
+    public abstract long unsharedHeapSizeExcludingData();
 
-            List<ByteBuffer> l1 = p1.getComponents();
-            List<ByteBuffer> l2 = p2.getComponents();
+    @Override
+    public final int hashCode()
+    {
+        int result = 31;
+        for (int i = 0; i < size(); i++)
+            result += 31 * Objects.hash(get(i));
+        return result;
+    }
 
-            int len = Math.min(l1.size(), l2.size());
-            for (int i = 0; i < len; i++) {
-                int cmp = l1.get(i).compareTo(l2.get(i));
-                if (cmp != 0) return cmp;
-            }
-            return Integer.compare(l1.size(), l2.size());
+    @Override
+    public final boolean equals(Object o)
+    {
+        if(!(o instanceof CellPath))
+            return false;
+
+        CellPath that = (CellPath)o;
+        if (this.size() != that.size())
+            return false;
+
+        for (int i = 0; i < size(); i++)
+            if (!Objects.equals(this.get(i), that.get(i)))
+                return false;
+
+        return true;
+    }
+
+    public interface Serializer
+    {
+        public void serialize(CellPath path, DataOutputPlus out) throws IOException;
+        public CellPath deserialize(DataInputPlus in) throws IOException;
+        public long serializedSize(CellPath path);
+        public void skip(DataInputPlus in) throws IOException;
+    }
+
+    private static class CollectionCellPath extends CellPath
+    {
+        private static final long EMPTY_SIZE = ObjectSizes.measure(new CollectionCellPath(ByteBufferUtil.EMPTY_BYTE_BUFFER));
+
+        protected final ByteBuffer value;
+
+        private CollectionCellPath(ByteBuffer value)
+        {
+            this.value = value;
+        }
+
+        public int size()
+        {
+            return 1;
+        }
+
+        public ByteBuffer get(int i)
+        {
+            assert i == 0;
+            return value;
+        }
+
+        public CellPath copy(AbstractAllocator allocator)
+        {
+            return new CollectionCellPath(allocator.clone(value));
+        }
+
+        public long unsharedHeapSizeExcludingData()
+        {
+            return EMPTY_SIZE + ObjectSizes.sizeOnHeapExcludingData(value);
+        }
+    }
+
+    private static class EmptyCellPath extends CellPath
+    {
+        public int size()
+        {
+            return 0;
+        }
+
+        public ByteBuffer get(int i)
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public CellPath copy(AbstractAllocator allocator)
+        {
+            return this;
+        }
+
+        public long unsharedHeapSizeExcludingData()
+        {
+            return 0;
         }
     }
 }

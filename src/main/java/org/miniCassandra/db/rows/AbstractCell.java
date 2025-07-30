@@ -1,84 +1,147 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.miniCassandra.db.rows;
 
-import org.miniCassandra.db.cql.ColumnMetadata;
+import org.miniCassandra.config.ColumnDefinition;
+import org.miniCassandra.db.marshal.AbstractType;
+import org.miniCassandra.db.marshal.CollectionType;
+import org.miniCassandra.serializers.MarshalException;
+import org.miniCassandra.utils.FBUtilities;
 
-import java.nio.ByteBuffer;
+import java.security.MessageDigest;
 import java.util.Objects;
 
-import static org.miniCassandra.db.rows.Constant.NO_DELETION_TIME;
-import static org.miniCassandra.db.rows.Constant.NO_TTL;
 
-public abstract class AbstractCell implements  Cell{
-    protected final ColumnMetadata column;
-    protected final long timestamp;
-    protected final int ttl;
-    protected final int localDeletionTime;
-
-    protected AbstractCell(ColumnMetadata column, long timestamp, int ttl, int localDeletionTime) {
-        this.column = column;
-        this.timestamp = timestamp;
-        this.ttl = ttl;
-        this.localDeletionTime = localDeletionTime;
+/**
+ * Base abstract class for {@code Cell} implementations.
+ *
+ * Unless you have a very good reason not to, every cell implementation
+ * should probably extend this class.
+ */
+public abstract class AbstractCell extends Cell
+{
+    protected AbstractCell(ColumnDefinition column)
+    {
+        super(column);
     }
 
+//    public void digest(MessageDigest digest)
+//    {
+//        if (isCounterCell())
+//        {
+//            CounterContext.instance().updateDigest(digest, value());
+//        }
+//        else
+//        {
+//            digest.update(value().duplicate());
+//        }
+//
+//        FBUtilities.updateWithLong(digest, timestamp());
+//        FBUtilities.updateWithInt(digest, ttl());
+//        FBUtilities.updateWithBoolean(digest, isCounterCell());
+//        if (path() != null)
+//            path().digest(digest);
+//    }
 
-    @Override
-    public ColumnMetadata column() {
-        return column;
+    public void validate()
+    {
+        if (ttl() < 0)
+            throw new MarshalException("A TTL should not be negative");
+        if (localDeletionTime() < 0)
+            throw new MarshalException("A local deletion time should not be negative");
+        if (isExpiring() && localDeletionTime() == NO_DELETION_TIME)
+            throw new MarshalException("Shoud not have a TTL without an associated local deletion time");
+
+        if (isTombstone())
+        {
+            // If cell is a tombstone, it shouldn't have a value.
+            if (value().hasRemaining())
+                throw new MarshalException("A tombstone should not have a value");
+        }
+        else
+        {
+            column().validateCellValue(value());
+        }
+
+        if (path() != null)
+            column().validateCellPath(path());
     }
 
-    @Override
-    public long timestamp() {
-        return timestamp;
-    }
-
-    @Override
-    public int ttl() {
-        return ttl;
-    }
-
-    @Override
-    public int localDeletionTime() {
-        return localDeletionTime;
-    }
-
-    @Override
-    public ByteBuffer value() {
-        return null;
-    }
-
-    @Override
-    public CellPath path() {
-        return CellPath.EMPTY;
-    }
-
-    @Override
-    public boolean isLive(long nowInSec) {
-        return localDeletionTime == NO_DELETION_TIME ||
-                (ttl == NO_TTL && localDeletionTime >= nowInSec) ||
-                (ttl != NO_TTL && nowInSec < localDeletionTime);
-    }
-
-    @Override
-    public int compareTimestamps(Cell other) {
-        return Long.compare(timestamp, other.timestamp());
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Cell)) return false;
-        Cell that = (Cell) o;
-        return timestamp == that.timestamp() &&
-                ttl == that.ttl() &&
-                localDeletionTime == that.localDeletionTime() &&
-                Objects.equals(column, that.column()) &&
-                Objects.equals(path(), that.path()) &&
-                value().equals(that.value());
+    public long maxTimestamp()
+    {
+        return timestamp();
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(column, timestamp, ttl, localDeletionTime, path(), value());
+    public boolean equals(Object other)
+    {
+        if (this == other)
+            return true;
+
+        if(!(other instanceof Cell))
+            return false;
+
+        Cell that = (Cell)other;
+        return this.column().equals(that.column())
+            && this.isCounterCell() == that.isCounterCell()
+            && this.timestamp() == that.timestamp()
+            && this.ttl() == that.ttl()
+            && this.localDeletionTime() == that.localDeletionTime()
+            && Objects.equals(this.value(), that.value())
+            && Objects.equals(this.path(), that.path());
     }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(column(), isCounterCell(), timestamp(), ttl(), localDeletionTime(), value(), path());
+    }
+
+//    @Override
+//    public String toString()
+//    {
+//        if (isCounterCell())
+//            return String.format("[%s=%d ts=%d]", column().name, CounterContext.instance().total(value()), timestamp());
+//
+//        AbstractType<?> type = column().type;
+//        if (type instanceof CollectionType && type.isMultiCell())
+//        {
+//            CollectionType ct = (CollectionType)type;
+//            return String.format("[%s[%s]=%s %s]",
+//                                 column().name,
+//                                 ct.nameComparator().getString(path().get(0)),
+//                                 ct.valueComparator().getString(value()),
+//                                 livenessInfoString());
+//        }
+//        if (isTombstone())
+//            return String.format("[%s=<tombstone> %s]", column().name, livenessInfoString());
+//        else
+//            return String.format("[%s=%s %s]", column().name, type.getString(value()), livenessInfoString());
+//    }
+
+    private String livenessInfoString()
+    {
+        if (isExpiring())
+            return String.format("ts=%d ttl=%d ldt=%d", timestamp(), ttl(), localDeletionTime());
+        else if (isTombstone())
+            return String.format("ts=%d ldt=%d", timestamp(), localDeletionTime());
+        else
+            return String.format("ts=%d", timestamp());
+    }
+
 }

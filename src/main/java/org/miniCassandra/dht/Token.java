@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 
-import org.apache.cassandra.db.PartitionPosition;
+import org.miniCassandra.db.PartitionPosition;
 import org.miniCassandra.db.TypeSizes;
 import org.miniCassandra.db.io.util.DataOutputPlus;
 import org.miniCassandra.exceptions.ConfigurationException;

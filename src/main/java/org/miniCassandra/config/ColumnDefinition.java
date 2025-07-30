@@ -25,11 +25,14 @@ import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.collect.Collections2;
 
-import org.apache.cassandra.cql3.*;
-import org.apache.cassandra.db.rows.*;
-import org.apache.cassandra.db.marshal.*;
-import org.apache.cassandra.serializers.MarshalException;
+
 import org.github.jamm.Unmetered;
+import org.miniCassandra.cql3.ColumnSpecification;
+import org.miniCassandra.db.marshal.AbstractType;
+import org.miniCassandra.db.marshal.CollectionType;
+import org.miniCassandra.db.rows.Cell;
+import org.miniCassandra.db.rows.CellPath;
+import org.miniCassandra.db.rows.ColumnData;
 
 @Unmetered
 public class ColumnDefinition extends ColumnSpecification implements Comparable<ColumnDefinition>

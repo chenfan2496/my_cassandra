@@ -31,33 +31,27 @@ import javax.annotation.Nullable;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.miniCassandra.cql3.ColumnIdentifier;
+import org.miniCassandra.db.DecoratedKey;
+import org.miniCassandra.db.PartitionColumns;
+import org.miniCassandra.db.UnknownColumnFamilyException;
+import org.miniCassandra.db.io.util.DataInputPlus;
+import org.miniCassandra.db.io.util.DataOutputPlus;
+import org.miniCassandra.db.marshal.*;
+import org.miniCassandra.dht.IPartitioner;
+import org.miniCassandra.exceptions.ConfigurationException;
+import org.miniCassandra.exceptions.InvalidRequestException;
+import org.miniCassandra.schema.IndexMetadata;
+import org.miniCassandra.schema.TableParams;
 import org.miniCassandra.utils.Pair;
+import org.miniCassandra.utils.UUIDGen;
+import org.miniCassandra.utils.UUIDSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.apache.cassandra.cql3.ColumnIdentifier;
-import org.apache.cassandra.cql3.QueryProcessor;
-import org.apache.cassandra.cql3.SuperColumnCompatibility;
-import org.apache.cassandra.cql3.statements.CFStatement;
-import org.apache.cassandra.cql3.statements.CreateTableStatement;
-import org.apache.cassandra.db.*;
-import org.apache.cassandra.db.compaction.AbstractCompactionStrategy;
-import org.apache.cassandra.db.marshal.*;
-import org.apache.cassandra.dht.IPartitioner;
-import org.apache.cassandra.exceptions.ConfigurationException;
-import org.apache.cassandra.exceptions.InvalidRequestException;
-import org.apache.cassandra.io.util.DataInputPlus;
-import org.apache.cassandra.io.util.DataOutputPlus;
-import org.apache.cassandra.schema.*;
-import org.apache.cassandra.utils.*;
 import org.github.jamm.Unmetered;
 
 /**
@@ -421,10 +415,10 @@ public final class CFMetaData
         this.hiddenColumns = hiddenColumns;
     }
 
-    public Indexes getIndexes()
-    {
-        return indexes;
-    }
+//    public Indexes getIndexes()
+//    {
+//        return indexes;
+//    }
 
     public static CFMetaData create(String ksName,
                                     String name,

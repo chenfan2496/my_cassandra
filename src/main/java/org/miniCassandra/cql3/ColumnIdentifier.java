@@ -26,8 +26,6 @@ import com.google.common.collect.MapMaker;
 
 
 import org.miniCassandra.cache.IMeasurableMemory;
-import org.miniCassandra.config.CFMetaData;
-import org.miniCassandra.cql3.selection.Selectable;
 import org.miniCassandra.db.marshal.AbstractType;
 import org.miniCassandra.db.marshal.UTF8Type;
 import org.miniCassandra.utils.ByteBufferUtil;
@@ -247,17 +245,17 @@ public class ColumnIdentifier implements IMeasurableMemory, Comparable<ColumnIde
      * once the comparator is known with prepare(). This should only be used with identifiers that are actual
      * column names. See CASSANDRA-8178 for more background.
      */
-    public static interface Raw extends Selectable.Raw
-    {
-
-        public Selectable prepare(CFMetaData cfm);
-
-        /**
-         * Returns a string representation of the identifier that is safe to use directly in CQL queries.
-         * In necessary, the string will be double-quoted, and any quotes inside the string will be escaped.
-         */
-        public String toCQLString();
-    }
+//    public static interface Raw extends Selectable.Raw
+//    {
+//
+//        public Selectable prepare(CFMetaData cfm);
+//
+//        /**
+//         * Returns a string representation of the identifier that is safe to use directly in CQL queries.
+//         * In necessary, the string will be double-quoted, and any quotes inside the string will be escaped.
+//         */
+//        public String toCQLString();
+//    }
 
 //    public static class Literal implements Raw
 //    {
@@ -270,25 +268,25 @@ public class ColumnIdentifier implements IMeasurableMemory, Comparable<ColumnIde
 //            this.text =  keepCase ? rawText : rawText.toLowerCase(Locale.US);
 //        }
 //
-//        public ColumnIdentifier prepare(CFMetaData cfm)
-//        {
-//            if (!cfm.isStaticCompactTable())
-//                return getInterned(text, true);
-//
-//            AbstractType<?> thriftColumnNameType = cfm.thriftColumnNameType();
-//            if (thriftColumnNameType instanceof UTF8Type)
-//                return getInterned(text, true);
-//
-//            // We have a Thrift-created table with a non-text comparator. Check if we have a match column, otherwise assume we should use
-//            // thriftColumnNameType
-//            ByteBuffer bufferName = ByteBufferUtil.bytes(text);
-//            for (ColumnDefinition def : cfm.allColumns())
-//            {
-//                if (def.name.bytes.equals(bufferName))
-//                    return def.name;
-//            }
-//            return getInterned(thriftColumnNameType, thriftColumnNameType.fromString(rawText), text);
-//        }
+////        public ColumnIdentifier prepare(CFMetaData cfm)
+////        {
+////            if (!cfm.isStaticCompactTable())
+////                return getInterned(text, true);
+////
+////            AbstractType<?> thriftColumnNameType = cfm.thriftColumnNameType();
+////            if (thriftColumnNameType instanceof UTF8Type)
+////                return getInterned(text, true);
+////
+////            // We have a Thrift-created table with a non-text comparator. Check if we have a match column, otherwise assume we should use
+////            // thriftColumnNameType
+////            ByteBuffer bufferName = ByteBufferUtil.bytes(text);
+////            for (ColumnDefinition def : cfm.allColumns())
+////            {
+////                if (def.name.bytes.equals(bufferName))
+////                    return def.name;
+////            }
+////            return getInterned(thriftColumnNameType, thriftColumnNameType.fromString(rawText), text);
+////        }
 //
 //        public boolean processesSelection()
 //        {
@@ -317,12 +315,12 @@ public class ColumnIdentifier implements IMeasurableMemory, Comparable<ColumnIde
 //            return text;
 //        }
 //
-//        public String toCQLString()
-//        {
-//            return maybeQuote(text);
-//        }
+////        public String toCQLString()
+////        {
+////            return maybeQuote(text);
+////        }
 //    }
-//
+
 //    public static class ColumnIdentifierValue implements Raw
 //    {
 //        private final ColumnIdentifier identifier;
@@ -368,7 +366,7 @@ public class ColumnIdentifier implements IMeasurableMemory, Comparable<ColumnIde
 //            return maybeQuote(identifier.text);
 //        }
 //    }
-
+//
 //    public static String maybeQuote(String text)
 //    {
 //        if (UNQUOTED_IDENTIFIER.matcher(text).matches() && !ReservedKeywords.isReserved(text))

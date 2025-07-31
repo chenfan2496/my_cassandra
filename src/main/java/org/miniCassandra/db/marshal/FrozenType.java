@@ -17,14 +17,14 @@
  */
 package org.miniCassandra.db.marshal;
 
+import org.miniCassandra.exceptions.ConfigurationException;
+import org.miniCassandra.exceptions.SyntaxException;
+import org.miniCassandra.serializers.MarshalException;
+import org.miniCassandra.serializers.TypeSerializer;
+
 import java.nio.ByteBuffer;
 import java.util.List;
 
-import org.apache.cassandra.cql3.Term;
-import org.apache.cassandra.exceptions.ConfigurationException;
-import org.apache.cassandra.exceptions.SyntaxException;
-import org.apache.cassandra.serializers.TypeSerializer;
-import org.apache.cassandra.serializers.MarshalException;
 
 /**
  * A fake type that is only used for parsing type strings that include frozen types.
@@ -56,10 +56,10 @@ public class FrozenType extends AbstractType<Void>
         throw new UnsupportedOperationException();
     }
 
-    public Term fromJSONObject(Object parsed) throws MarshalException
-    {
-        throw new UnsupportedOperationException();
-    }
+//    public Term fromJSONObject(Object parsed) throws MarshalException
+//    {
+//        throw new UnsupportedOperationException();
+//    }
 
     public String toJSONString(ByteBuffer buffer, int protocolVersion)
     {

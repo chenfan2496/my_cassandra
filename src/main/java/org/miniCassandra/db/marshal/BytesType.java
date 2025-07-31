@@ -17,16 +17,15 @@
  */
 package org.miniCassandra.db.marshal;
 
+//import org.miniCassandra.cql3.CQL3Type;
+import org.miniCassandra.serializers.BytesSerializer;
+import org.miniCassandra.serializers.MarshalException;
+import org.miniCassandra.serializers.TypeSerializer;
+import org.miniCassandra.utils.ByteBufferUtil;
+import org.miniCassandra.utils.Hex;
+
 import java.nio.ByteBuffer;
 
-import org.apache.cassandra.cql3.CQL3Type;
-import org.apache.cassandra.cql3.Constants;
-import org.apache.cassandra.cql3.Term;
-import org.apache.cassandra.serializers.TypeSerializer;
-import org.apache.cassandra.serializers.BytesSerializer;
-import org.apache.cassandra.serializers.MarshalException;
-import org.apache.cassandra.utils.ByteBufferUtil;
-import org.apache.cassandra.utils.Hex;
 
 public class BytesType extends AbstractType<ByteBuffer>
 {
@@ -46,22 +45,22 @@ public class BytesType extends AbstractType<ByteBuffer>
         }
     }
 
-    @Override
-    public Term fromJSONObject(Object parsed) throws MarshalException
-    {
-        try
-        {
-            String parsedString = (String) parsed;
-            if (!parsedString.startsWith("0x"))
-                throw new MarshalException(String.format("String representation of blob is missing 0x prefix: %s", parsedString));
-
-            return new Constants.Value(BytesType.instance.fromString(parsedString.substring(2)));
-        }
-        catch (ClassCastException | MarshalException exc)
-        {
-            throw new MarshalException(String.format("Value '%s' is not a valid blob representation: %s", parsed, exc.getMessage()));
-        }
-    }
+//    @Override
+//    public Term fromJSONObject(Object parsed) throws MarshalException
+//    {
+//        try
+//        {
+//            String parsedString = (String) parsed;
+//            if (!parsedString.startsWith("0x"))
+//                throw new MarshalException(String.format("String representation of blob is missing 0x prefix: %s", parsedString));
+//
+//            return new Constants.Value(BytesType.instance.fromString(parsedString.substring(2)));
+//        }
+//        catch (ClassCastException | MarshalException exc)
+//        {
+//            throw new MarshalException(String.format("Value '%s' is not a valid blob representation: %s", parsed, exc.getMessage()));
+//        }
+//    }
 
     @Override
     public String toJSONString(ByteBuffer buffer, int protocolVersion)
@@ -84,10 +83,10 @@ public class BytesType extends AbstractType<ByteBuffer>
         return true;
     }
 
-    public CQL3Type asCQL3Type()
-    {
-        return CQL3Type.Native.BLOB;
-    }
+//    public CQL3Type asCQL3Type()
+//    {
+//        return CQL3Type.Native.BLOB;
+//    }
 
     public TypeSerializer<ByteBuffer> getSerializer()
     {

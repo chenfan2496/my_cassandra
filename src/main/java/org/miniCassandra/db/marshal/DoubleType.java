@@ -17,15 +17,12 @@
  */
 package org.miniCassandra.db.marshal;
 
-import java.nio.ByteBuffer;
+import org.miniCassandra.serializers.DoubleSerializer;
+import org.miniCassandra.serializers.MarshalException;
+import org.miniCassandra.serializers.TypeSerializer;
+import org.miniCassandra.utils.ByteBufferUtil;
 
-import org.apache.cassandra.cql3.CQL3Type;
-import org.apache.cassandra.cql3.Constants;
-import org.apache.cassandra.cql3.Term;
-import org.apache.cassandra.serializers.TypeSerializer;
-import org.apache.cassandra.serializers.DoubleSerializer;
-import org.apache.cassandra.serializers.MarshalException;
-import org.apache.cassandra.utils.ByteBufferUtil;
+import java.nio.ByteBuffer;
 
 public class DoubleType extends AbstractType<Double>
 {
@@ -65,22 +62,22 @@ public class DoubleType extends AbstractType<Double>
       return decompose(d);
     }
 
-    @Override
-    public Term fromJSONObject(Object parsed) throws MarshalException
-    {
-        try
-        {
-            if (parsed instanceof String)
-                return new Constants.Value(fromString((String) parsed));
-            else
-                return new Constants.Value(getSerializer().serialize(((Number) parsed).doubleValue()));
-        }
-        catch (ClassCastException exc)
-        {
-            throw new MarshalException(String.format(
-                    "Expected a double value, but got a %s: %s", parsed.getClass().getSimpleName(), parsed));
-        }
-    }
+//    @Override
+//    public Term fromJSONObject(Object parsed) throws MarshalException
+//    {
+//        try
+//        {
+//            if (parsed instanceof String)
+//                return new Constants.Value(fromString((String) parsed));
+//            else
+//                return new Constants.Value(getSerializer().serialize(((Number) parsed).doubleValue()));
+//        }
+//        catch (ClassCastException exc)
+//        {
+//            throw new MarshalException(String.format(
+//                    "Expected a double value, but got a %s: %s", parsed.getClass().getSimpleName(), parsed));
+//        }
+//    }
 
     @Override
     public String toJSONString(ByteBuffer buffer, int protocolVersion)
@@ -94,10 +91,10 @@ public class DoubleType extends AbstractType<Double>
         return value.toString();
     }
 
-    public CQL3Type asCQL3Type()
-    {
-        return CQL3Type.Native.DOUBLE;
-    }
+//    public CQL3Type asCQL3Type()
+//    {
+//        return CQL3Type.Native.DOUBLE;
+//    }
 
     public TypeSerializer<Double> getSerializer()
     {

@@ -31,16 +31,13 @@ import java.util.Objects;
 import org.miniCassandra.db.TypeSizes;
 import org.miniCassandra.db.io.util.DataInputPlus;
 import org.miniCassandra.db.io.util.DataOutputPlus;
+import org.miniCassandra.exceptions.SyntaxException;
+import org.miniCassandra.serializers.MarshalException;
+import org.miniCassandra.serializers.TypeSerializer;
 import org.miniCassandra.utils.ByteBufferUtil;
 import org.miniCassandra.utils.FastByteOperations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.apache.cassandra.cql3.CQL3Type;
-import org.apache.cassandra.cql3.Term;
-import org.apache.cassandra.exceptions.SyntaxException;
-import org.apache.cassandra.serializers.TypeSerializer;
-import org.apache.cassandra.serializers.MarshalException;
 
 import org.github.jamm.Unmetered;
 
@@ -100,13 +97,13 @@ public abstract class AbstractType<T> implements Comparator<ByteBuffer>
         }
     }
 
-    public static List<String> asCQLTypeStringList(List<AbstractType<?>> abstractTypes)
-    {
-        List<String> r = new ArrayList<>(abstractTypes.size());
-        for (AbstractType<?> abstractType : abstractTypes)
-            r.add(abstractType.asCQL3Type().toString());
-        return r;
-    }
+//    public static List<String> asCQLTypeStringList(List<AbstractType<?>> abstractTypes)
+//    {
+//        List<String> r = new ArrayList<>(abstractTypes.size());
+//        for (AbstractType<?> abstractType : abstractTypes)
+//            r.add(abstractType.asCQL3Type().toString());
+//        return r;
+//    }
 
     public T compose(ByteBuffer bytes)
     {
@@ -136,7 +133,7 @@ public abstract class AbstractType<T> implements Comparator<ByteBuffer>
     /** Given a parsed JSON string, return a byte representation of the object.
      * @param parsed the result of parsing a json string
      **/
-    public abstract Term fromJSONObject(Object parsed) throws MarshalException;
+    //public abstract Term fromJSONObject(Object parsed) throws MarshalException;
 
     /**
      * Converts the specified value into its JSON representation.
@@ -193,11 +190,11 @@ public abstract class AbstractType<T> implements Comparator<ByteBuffer>
         validate(cellValue);
     }
 
-    /* Most of our internal type should override that. */
-    public CQL3Type asCQL3Type()
-    {
-        return new CQL3Type.Custom(this);
-    }
+//    /* Most of our internal type should override that. */
+//    public CQL3Type asCQL3Type()
+//    {
+//        return new CQL3Type.Custom(this);
+//    }
 
     /**
      * Same as compare except that this ignore ReversedType. This is to be use when

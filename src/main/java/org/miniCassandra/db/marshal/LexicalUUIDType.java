@@ -17,16 +17,15 @@
  */
 package org.miniCassandra.db.marshal;
 
+import org.miniCassandra.serializers.MarshalException;
+import org.miniCassandra.serializers.TypeSerializer;
+import org.miniCassandra.serializers.UUIDSerializer;
+import org.miniCassandra.utils.ByteBufferUtil;
+import org.miniCassandra.utils.UUIDGen;
+
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
-import org.apache.cassandra.cql3.Constants;
-import org.apache.cassandra.cql3.Term;
-import org.apache.cassandra.serializers.TypeSerializer;
-import org.apache.cassandra.serializers.MarshalException;
-import org.apache.cassandra.serializers.UUIDSerializer;
-import org.apache.cassandra.utils.ByteBufferUtil;
-import org.apache.cassandra.utils.UUIDGen;
 
 public class LexicalUUIDType extends AbstractType<UUID>
 {
@@ -66,19 +65,19 @@ public class LexicalUUIDType extends AbstractType<UUID>
         }
     }
 
-    @Override
-    public Term fromJSONObject(Object parsed) throws MarshalException
-    {
-        try
-        {
-            return new Constants.Value(fromString((String) parsed));
-        }
-        catch (ClassCastException exc)
-        {
-            throw new MarshalException(String.format(
-                    "Expected a string representation of a uuid, but got a %s: %s", parsed.getClass().getSimpleName(), parsed));
-        }
-    }
+//    @Override
+//    public Term fromJSONObject(Object parsed) throws MarshalException
+//    {
+//        try
+//        {
+//            return new Constants.Value(fromString((String) parsed));
+//        }
+//        catch (ClassCastException exc)
+//        {
+//            throw new MarshalException(String.format(
+//                    "Expected a string representation of a uuid, but got a %s: %s", parsed.getClass().getSimpleName(), parsed));
+//        }
+//    }
 
     public TypeSerializer<UUID> getSerializer()
     {

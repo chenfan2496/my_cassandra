@@ -550,25 +550,10 @@ public class ByteBufferUtil
             }
         };
     }
-
-//    public static String bytesToHex(ByteBuffer bytes)
-//    {
-//        final int offset = bytes.position();
-//        final int size = bytes.remaining();
-//        final char[] c = new char[size * 2];
-//        for (int i = 0; i < size; i++)
-//        {
-//            final int bint = bytes.get(i+offset);
-//            c[i * 2] = Hex.byteToChar[(bint & 0xf0) >> 4];
-//            c[1 + i * 2] = Hex.byteToChar[bint & 0x0f];
-//        }
-//        return Hex.wrapCharArray(c);
-//    }
-
-//    public static ByteBuffer hexToBytes(String str)
-//    {
-//        return ByteBuffer.wrap(Hex.hexToBytes(str));
-//    }
+    public static ByteBuffer hexToBytes(String str)
+    {
+        return ByteBuffer.wrap(Hex.hexToBytes(str));
+    }
 
     /**
      * Compare two ByteBuffer at specified offsets for length.

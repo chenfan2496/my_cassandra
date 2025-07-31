@@ -22,15 +22,13 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.cassandra.cql3.Term;
+import org.miniCassandra.exceptions.ConfigurationException;
+import org.miniCassandra.exceptions.SyntaxException;
+import org.miniCassandra.serializers.MarshalException;
+import org.miniCassandra.serializers.TypeSerializer;
+import org.miniCassandra.utils.ByteBufferUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.apache.cassandra.exceptions.ConfigurationException;
-import org.apache.cassandra.exceptions.SyntaxException;
-import org.apache.cassandra.serializers.TypeSerializer;
-import org.apache.cassandra.serializers.MarshalException;
-import org.apache.cassandra.utils.ByteBufferUtil;
 
 /*
  * The encoding of a DynamicCompositeType column name should be:
@@ -374,11 +372,11 @@ public class DynamicCompositeType extends AbstractCompositeType
             throw new UnsupportedOperationException();
         }
 
-        @Override
-        public Term fromJSONObject(Object parsed)
-        {
-            throw new UnsupportedOperationException();
-        }
+//        @Override
+//        public Term fromJSONObject(Object parsed)
+//        {
+//            throw new UnsupportedOperationException();
+//        }
 
         @Override
         public String toJSONString(ByteBuffer buffer, int protocolVersion)

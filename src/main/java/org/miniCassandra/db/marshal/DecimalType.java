@@ -17,17 +17,16 @@
  */
 package org.miniCassandra.db.marshal;
 
+//import org.miniCassandra.cql3.CQL3Type;
+import org.miniCassandra.serializers.DecimalSerializer;
+import org.miniCassandra.serializers.MarshalException;
+import org.miniCassandra.serializers.TypeSerializer;
+import org.miniCassandra.utils.ByteBufferUtil;
+
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.util.Objects;
 
-import org.apache.cassandra.cql3.CQL3Type;
-import org.apache.cassandra.cql3.Constants;
-import org.apache.cassandra.cql3.Term;
-import org.apache.cassandra.serializers.TypeSerializer;
-import org.apache.cassandra.serializers.DecimalSerializer;
-import org.apache.cassandra.serializers.MarshalException;
-import org.apache.cassandra.utils.ByteBufferUtil;
 
 public class DecimalType extends AbstractType<BigDecimal>
 {
@@ -67,18 +66,18 @@ public class DecimalType extends AbstractType<BigDecimal>
         return decompose(decimal);
     }
 
-    @Override
-    public Term fromJSONObject(Object parsed) throws MarshalException
-    {
-        try
-        {
-            return new Constants.Value(fromString(Objects.toString(parsed)));
-        }
-        catch (NumberFormatException | MarshalException exc)
-        {
-            throw new MarshalException(String.format("Value '%s' is not a valid representation of a decimal value", parsed));
-        }
-    }
+//    @Override
+//    public Term fromJSONObject(Object parsed) throws MarshalException
+//    {
+//        try
+//        {
+//            return new Constants.Value(fromString(Objects.toString(parsed)));
+//        }
+//        catch (NumberFormatException | MarshalException exc)
+//        {
+//            throw new MarshalException(String.format("Value '%s' is not a valid representation of a decimal value", parsed));
+//        }
+//    }
 
     @Override
     public String toJSONString(ByteBuffer buffer, int protocolVersion)
@@ -86,10 +85,10 @@ public class DecimalType extends AbstractType<BigDecimal>
         return Objects.toString(getSerializer().deserialize(buffer), "\"\"");
     }
 
-    public CQL3Type asCQL3Type()
-    {
-        return CQL3Type.Native.DECIMAL;
-    }
+//    public CQL3Type asCQL3Type()
+//    {
+//        return CQL3Type.Native.DECIMAL;
+//    }
 
     public TypeSerializer<BigDecimal> getSerializer()
     {

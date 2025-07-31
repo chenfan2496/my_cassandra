@@ -20,19 +20,16 @@ package org.miniCassandra.db.marshal;
 import java.nio.ByteBuffer;
 import java.util.concurrent.TimeUnit;
 
+//import org.miniCassandra.cql3.CQL3Type;
+import org.miniCassandra.db.io.util.DataInputPlus;
+import org.miniCassandra.db.io.util.DataOutputPlus;
+import org.miniCassandra.serializers.EmptySerializer;
+import org.miniCassandra.serializers.MarshalException;
+import org.miniCassandra.serializers.TypeSerializer;
+import org.miniCassandra.utils.ByteBufferUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.cassandra.cql3.CQL3Type;
-import org.apache.cassandra.cql3.Constants;
-import org.apache.cassandra.cql3.Term;
-import org.apache.cassandra.io.util.DataInputPlus;
-import org.apache.cassandra.io.util.DataOutputPlus;
-import org.apache.cassandra.serializers.TypeSerializer;
-import org.apache.cassandra.serializers.EmptySerializer;
-import org.apache.cassandra.serializers.MarshalException;
-import org.apache.cassandra.utils.ByteBufferUtil;
-import org.apache.cassandra.utils.NoSpamLogger;
 
 /**
  * A type that only accept empty data.
@@ -44,7 +41,7 @@ public class EmptyType extends AbstractType<Void>
 
     private static final Logger logger = LoggerFactory.getLogger(EmptyType.class);
     private static final String KEY_EMPTYTYPE_NONEMPTY_BEHAVIOR = "cassandra.serialization.emptytype.nonempty_behavior";
-    private static final NoSpamLogger NON_EMPTY_WRITE_LOGGER = NoSpamLogger.getLogger(logger, 1, TimeUnit.MINUTES);
+    //private static final NoSpamLogger NON_EMPTY_WRITE_LOGGER = NoSpamLogger.getLogger(logger, 1, TimeUnit.MINUTES);
     private static final NonEmptyWriteBehavior NON_EMPTY_WRITE_BEHAVIOR = parseNonEmptyWriteBehavior();
 
     private static NonEmptyWriteBehavior parseNonEmptyWriteBehavior()
@@ -85,22 +82,21 @@ public class EmptyType extends AbstractType<Void>
         return ByteBufferUtil.EMPTY_BYTE_BUFFER;
     }
 
-    @Override
-    public Term fromJSONObject(Object parsed) throws MarshalException
-    {
-        if (!(parsed instanceof String))
-            throw new MarshalException(String.format("Expected an empty string, but got: %s", parsed));
-        if (!((String) parsed).isEmpty())
-            throw new MarshalException(String.format("'%s' is not empty", parsed));
+//    @Override
+//    public Term fromJSONObject(Object parsed) throws MarshalException
+//    {
+//        if (!(parsed instanceof String))
+//            throw new MarshalException(String.format("Expected an empty string, but got: %s", parsed));
+//        if (!((String) parsed).isEmpty())
+//            throw new MarshalException(String.format("'%s' is not empty", parsed));
+//
+//        return new Constants.Value(ByteBufferUtil.EMPTY_BYTE_BUFFER);
+//    }
 
-        return new Constants.Value(ByteBufferUtil.EMPTY_BYTE_BUFFER);
-    }
-
-    @Override
-    public CQL3Type asCQL3Type()
-    {
-        return CQL3Type.Native.EMPTY;
-    }
+//    public CQL3Type asCQL3Type()
+//    {
+//        return CQL3Type.Native.EMPTY;
+//    }
 
     public String toJSONString(ByteBuffer buffer, int protocolVersion)
     {
@@ -143,7 +139,7 @@ public class EmptyType extends AbstractType<Void>
         switch (NON_EMPTY_WRITE_BEHAVIOR)
         {
             case LOG_DATA_LOSS:
-                NON_EMPTY_WRITE_LOGGER.warn("Dropping data...", new NonEmptyWriteException("Attempted to write a non-empty value using EmptyType"));
+                //NON_EMPTY_WRITE_LOGGER.warn("Dropping data...", new NonEmptyWriteException("Attempted to write a non-empty value using EmptyType"));
             case SILENT_DATA_LOSS:
                 return;
             case FAIL:

@@ -22,15 +22,12 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 import com.google.common.primitives.UnsignedLongs;
-
-import org.apache.cassandra.cql3.CQL3Type;
-import org.apache.cassandra.cql3.Constants;
-import org.apache.cassandra.cql3.Term;
-import org.apache.cassandra.serializers.TypeSerializer;
-import org.apache.cassandra.serializers.MarshalException;
-import org.apache.cassandra.serializers.UUIDSerializer;
-import org.apache.cassandra.utils.ByteBufferUtil;
-import org.apache.cassandra.utils.UUIDGen;
+//import org.miniCassandra.cql3.CQL3Type;
+import org.miniCassandra.serializers.MarshalException;
+import org.miniCassandra.serializers.TypeSerializer;
+import org.miniCassandra.serializers.UUIDSerializer;
+import org.miniCassandra.utils.ByteBufferUtil;
+import org.miniCassandra.utils.UUIDGen;
 
 /**
  * Compares UUIDs using the following criteria:<br>
@@ -118,11 +115,10 @@ public class UUIDType extends AbstractType<UUID>
         throw new MarshalException(String.format("Unable to make UUID from '%s'", source));
     }
 
-    @Override
-    public CQL3Type asCQL3Type()
-    {
-        return CQL3Type.Native.UUID;
-    }
+//    public CQL3Type asCQL3Type()
+//    {
+//        return CQL3Type.Native.UUID;
+//    }
 
     public TypeSerializer<UUID> getSerializer()
     {
@@ -151,19 +147,19 @@ public class UUIDType extends AbstractType<UUID>
         return null;
     }
 
-    @Override
-    public Term fromJSONObject(Object parsed) throws MarshalException
-    {
-        try
-        {
-            return new Constants.Value(fromString((String) parsed));
-        }
-        catch (ClassCastException exc)
-        {
-            throw new MarshalException(String.format(
-                    "Expected a string representation of a uuid, but got a %s: %s", parsed.getClass().getSimpleName(), parsed));
-        }
-    }
+//    @Override
+//    public Term fromJSONObject(Object parsed) throws MarshalException
+//    {
+//        try
+//        {
+//            return new Constants.Value(fromString((String) parsed));
+//        }
+//        catch (ClassCastException exc)
+//        {
+//            throw new MarshalException(String.format(
+//                    "Expected a string representation of a uuid, but got a %s: %s", parsed.getClass().getSimpleName(), parsed));
+//        }
+//    }
 
     static int version(ByteBuffer uuid)
     {

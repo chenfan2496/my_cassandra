@@ -19,13 +19,11 @@ package org.miniCassandra.db.marshal;
 
 import java.nio.ByteBuffer;
 
-import org.apache.cassandra.cql3.CQL3Type;
-import org.apache.cassandra.cql3.Constants;
-import org.apache.cassandra.cql3.Term;
-import org.apache.cassandra.serializers.TypeSerializer;
-import org.apache.cassandra.serializers.BooleanSerializer;
-import org.apache.cassandra.serializers.MarshalException;
 
+//import org.miniCassandra.cql3.CQL3Type;
+import org.miniCassandra.serializers.BooleanSerializer;
+import org.miniCassandra.serializers.MarshalException;
+import org.miniCassandra.serializers.TypeSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,17 +65,17 @@ public class BooleanType extends AbstractType<Boolean>
         throw new MarshalException(String.format("Unable to make boolean from '%s'", source));
     }
 
-    @Override
-    public Term fromJSONObject(Object parsed) throws MarshalException
-    {
-        if (parsed instanceof String)
-            return new Constants.Value(fromString((String) parsed));
-        else if (!(parsed instanceof Boolean))
-            throw new MarshalException(String.format(
-                    "Expected a boolean value, but got a %s: %s", parsed.getClass().getSimpleName(), parsed));
-
-        return new Constants.Value(getSerializer().serialize((Boolean) parsed));
-    }
+//    @Override
+//    public Term fromJSONObject(Object parsed) throws MarshalException
+//    {
+//        if (parsed instanceof String)
+//            return new Constants.Value(fromString((String) parsed));
+//        else if (!(parsed instanceof Boolean))
+//            throw new MarshalException(String.format(
+//                    "Expected a boolean value, but got a %s: %s", parsed.getClass().getSimpleName(), parsed));
+//
+//        return new Constants.Value(getSerializer().serialize((Boolean) parsed));
+//    }
 
     @Override
     public String toJSONString(ByteBuffer buffer, int protocolVersion)
@@ -85,10 +83,10 @@ public class BooleanType extends AbstractType<Boolean>
         return getSerializer().deserialize(buffer).toString();
     }
 
-    public CQL3Type asCQL3Type()
-    {
-        return CQL3Type.Native.BOOLEAN;
-    }
+//    public CQL3Type asCQL3Type()
+//    {
+//        return CQL3Type.Native.BOOLEAN;
+//    }
 
     public TypeSerializer<Boolean> getSerializer()
     {

@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.miniCassandra.serializers.BytesSerializer;
+import org.miniCassandra.serializers.MarshalException;
+import org.miniCassandra.serializers.TypeSerializer;
 import org.miniCassandra.utils.ByteBufferUtil;
 
 /**
@@ -235,11 +238,11 @@ public abstract class AbstractCompositeType extends AbstractType<ByteBuffer>
         return bb;
     }
 
-    @Override
-    public Term fromJSONObject(Object parsed)
-    {
-        throw new UnsupportedOperationException();
-    }
+//    @Override
+//    public Term fromJSONObject(Object parsed)
+//    {
+//        throw new UnsupportedOperationException();
+//    }
 
     @Override
     public String toJSONString(ByteBuffer buffer, int protocolVersion)

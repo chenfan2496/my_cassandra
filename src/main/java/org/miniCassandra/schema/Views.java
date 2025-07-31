@@ -22,14 +22,11 @@
 //import java.util.Iterator;
 //import java.util.Optional;
 //
-//import javax.annotation.Nullable;
 //
 //import com.google.common.collect.ImmutableMap;
 //import com.google.common.collect.Iterables;
 //import com.google.common.collect.MapDifference;
 //import com.google.common.collect.Maps;
-//import org.miniCassandra.config.CFMetaData;
-//
 //
 //import static com.google.common.collect.Iterables.filter;
 //

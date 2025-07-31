@@ -17,17 +17,14 @@
  */
 package org.miniCassandra.db.marshal;
 
+import org.miniCassandra.exceptions.ConfigurationException;
+import org.miniCassandra.exceptions.SyntaxException;
+import org.miniCassandra.serializers.TypeSerializer;
+
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
-
-import org.apache.cassandra.cql3.CQL3Type;
-import org.apache.cassandra.cql3.Term;
-import org.apache.cassandra.exceptions.ConfigurationException;
-import org.apache.cassandra.exceptions.SyntaxException;
-import org.apache.cassandra.serializers.MarshalException;
-import org.apache.cassandra.serializers.TypeSerializer;
 
 public class ReversedType<T> extends AbstractType<T>
 {
@@ -87,11 +84,11 @@ public class ReversedType<T> extends AbstractType<T>
         return baseType.fromString(source);
     }
 
-    @Override
-    public Term fromJSONObject(Object parsed) throws MarshalException
-    {
-        return baseType.fromJSONObject(parsed);
-    }
+//    @Override
+//    public Term fromJSONObject(Object parsed) throws MarshalException
+//    {
+//        return baseType.fromJSONObject(parsed);
+//    }
 
     @Override
     public String toJSONString(ByteBuffer buffer, int protocolVersion)
@@ -107,12 +104,12 @@ public class ReversedType<T> extends AbstractType<T>
 
         return this.baseType.isCompatibleWith(((ReversedType) otherType).baseType);
     }
-
-    @Override
-    public CQL3Type asCQL3Type()
-    {
-        return baseType.asCQL3Type();
-    }
+//
+//    @Override
+//    public CQL3Type asCQL3Type()
+//    {
+//        return baseType.asCQL3Type();
+//    }
 
     public TypeSerializer<T> getSerializer()
     {

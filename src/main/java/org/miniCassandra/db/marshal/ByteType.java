@@ -17,15 +17,14 @@
  */
 package org.miniCassandra.db.marshal;
 
+//import org.miniCassandra.cql3.CQL3Type;
+import org.miniCassandra.serializers.ByteSerializer;
+import org.miniCassandra.serializers.MarshalException;
+import org.miniCassandra.serializers.TypeSerializer;
+import org.miniCassandra.utils.ByteBufferUtil;
+
 import java.nio.ByteBuffer;
 
-import org.apache.cassandra.cql3.CQL3Type;
-import org.apache.cassandra.cql3.Constants;
-import org.apache.cassandra.cql3.Term;
-import org.apache.cassandra.serializers.ByteSerializer;
-import org.apache.cassandra.serializers.MarshalException;
-import org.apache.cassandra.serializers.TypeSerializer;
-import org.apache.cassandra.utils.ByteBufferUtil;
 
 public class ByteType extends AbstractType<Byte>
 {
@@ -61,14 +60,14 @@ public class ByteType extends AbstractType<Byte>
         return decompose(b);
     }
 
-    public Term fromJSONObject(Object parsed) throws MarshalException
-    {
-        if (parsed instanceof String || parsed instanceof Number)
-            return new Constants.Value(fromString(String.valueOf(parsed)));
-
-        throw new MarshalException(String.format(
-                "Expected a byte value, but got a %s: %s", parsed.getClass().getSimpleName(), parsed));
-    }
+//    public Term fromJSONObject(Object parsed) throws MarshalException
+//    {
+//        if (parsed instanceof String || parsed instanceof Number)
+//            return new Constants.Value(fromString(String.valueOf(parsed)));
+//
+//        throw new MarshalException(String.format(
+//                "Expected a byte value, but got a %s: %s", parsed.getClass().getSimpleName(), parsed));
+//    }
 
     @Override
     public String toJSONString(ByteBuffer buffer, int protocolVersion)
@@ -76,11 +75,10 @@ public class ByteType extends AbstractType<Byte>
         return getSerializer().deserialize(buffer).toString();
     }
 
-    @Override
-    public CQL3Type asCQL3Type()
-    {
-        return CQL3Type.Native.TINYINT;
-    }
+//    public CQL3Type asCQL3Type()
+//    {
+//        return CQL3Type.Native.TINYINT;
+//    }
 
     @Override
     public TypeSerializer<Byte> getSerializer()

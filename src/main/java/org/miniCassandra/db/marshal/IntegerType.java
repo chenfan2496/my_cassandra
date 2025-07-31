@@ -17,17 +17,15 @@
  */
 package org.miniCassandra.db.marshal;
 
+//import org.miniCassandra.cql3.CQL3Type;
+import org.miniCassandra.serializers.IntegerSerializer;
+import org.miniCassandra.serializers.MarshalException;
+import org.miniCassandra.serializers.TypeSerializer;
+import org.miniCassandra.utils.ByteBufferUtil;
+
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.Objects;
-
-import org.apache.cassandra.cql3.CQL3Type;
-import org.apache.cassandra.cql3.Constants;
-import org.apache.cassandra.cql3.Term;
-import org.apache.cassandra.serializers.TypeSerializer;
-import org.apache.cassandra.serializers.IntegerSerializer;
-import org.apache.cassandra.serializers.MarshalException;
-import org.apache.cassandra.utils.ByteBufferUtil;
 
 public final class IntegerType extends AbstractType<BigInteger>
 {
@@ -149,19 +147,19 @@ public final class IntegerType extends AbstractType<BigInteger>
         return decompose(integerType);
     }
 
-    @Override
-    public Term fromJSONObject(Object parsed) throws MarshalException
-    {
-        try
-        {
-            return new Constants.Value(getSerializer().serialize(new BigInteger(parsed.toString())));
-        }
-        catch (NumberFormatException exc)
-        {
-            throw new MarshalException(String.format(
-                    "Value '%s' is not a valid representation of a varint value", parsed));
-        }
-    }
+//    @Override
+//    public Term fromJSONObject(Object parsed) throws MarshalException
+//    {
+//        try
+//        {
+//            return new Constants.Value(getSerializer().serialize(new BigInteger(parsed.toString())));
+//        }
+//        catch (NumberFormatException exc)
+//        {
+//            throw new MarshalException(String.format(
+//                    "Value '%s' is not a valid representation of a varint value", parsed));
+//        }
+//    }
 
     @Override
     public String toJSONString(ByteBuffer buffer, int protocolVersion)
@@ -175,10 +173,10 @@ public final class IntegerType extends AbstractType<BigInteger>
         return this == otherType || Int32Type.instance.isValueCompatibleWith(otherType) || LongType.instance.isValueCompatibleWith(otherType);
     }
 
-    public CQL3Type asCQL3Type()
-    {
-        return CQL3Type.Native.VARINT;
-    }
+//    public CQL3Type asCQL3Type()
+//    {
+//        return CQL3Type.Native.VARINT;
+//    }
 
     public TypeSerializer<BigInteger> getSerializer()
     {

@@ -17,16 +17,15 @@
  */
 package org.miniCassandra.db.marshal;
 
+//import org.miniCassandra.cql3.CQL3Type;
+import org.miniCassandra.serializers.LongSerializer;
+import org.miniCassandra.serializers.MarshalException;
+import org.miniCassandra.serializers.TypeSerializer;
+import org.miniCassandra.utils.ByteBufferUtil;
+
 import java.nio.ByteBuffer;
 import java.util.Objects;
 
-import org.apache.cassandra.cql3.CQL3Type;
-import org.apache.cassandra.cql3.Constants;
-import org.apache.cassandra.cql3.Term;
-import org.apache.cassandra.serializers.TypeSerializer;
-import org.apache.cassandra.serializers.LongSerializer;
-import org.apache.cassandra.serializers.MarshalException;
-import org.apache.cassandra.utils.ByteBufferUtil;
 
 public class LongType extends AbstractType<Long>
 {
@@ -76,26 +75,26 @@ public class LongType extends AbstractType<Long>
         return decompose(longType);
     }
 
-    @Override
-    public Term fromJSONObject(Object parsed) throws MarshalException
-    {
-        try
-        {
-            if (parsed instanceof String)
-                return new Constants.Value(fromString((String) parsed));
-
-            Number parsedNumber = (Number) parsed;
-            if (!(parsedNumber instanceof Integer || parsedNumber instanceof Long))
-                throw new MarshalException(String.format("Expected a bigint value, but got a %s: %s", parsed.getClass().getSimpleName(), parsed));
-
-            return new Constants.Value(getSerializer().serialize(parsedNumber.longValue()));
-        }
-        catch (ClassCastException exc)
-        {
-            throw new MarshalException(String.format(
-                    "Expected a bigint value, but got a %s: %s", parsed.getClass().getSimpleName(), parsed));
-        }
-    }
+//    @Override
+//    public Term fromJSONObject(Object parsed) throws MarshalException
+//    {
+//        try
+//        {
+//            if (parsed instanceof String)
+//                return new Constants.Value(fromString((String) parsed));
+//
+//            Number parsedNumber = (Number) parsed;
+//            if (!(parsedNumber instanceof Integer || parsedNumber instanceof Long))
+//                throw new MarshalException(String.format("Expected a bigint value, but got a %s: %s", parsed.getClass().getSimpleName(), parsed));
+//
+//            return new Constants.Value(getSerializer().serialize(parsedNumber.longValue()));
+//        }
+//        catch (ClassCastException exc)
+//        {
+//            throw new MarshalException(String.format(
+//                    "Expected a bigint value, but got a %s: %s", parsed.getClass().getSimpleName(), parsed));
+//        }
+//    }
 
     @Override
     public String toJSONString(ByteBuffer buffer, int protocolVersion)
@@ -109,10 +108,10 @@ public class LongType extends AbstractType<Long>
         return this == otherType || otherType == DateType.instance || otherType == TimestampType.instance;
     }
 
-    public CQL3Type asCQL3Type()
-    {
-        return CQL3Type.Native.BIGINT;
-    }
+//    public CQL3Type asCQL3Type()
+//    {
+//        return CQL3Type.Native.BIGINT;
+//    }
 
     public TypeSerializer<Long> getSerializer()
     {

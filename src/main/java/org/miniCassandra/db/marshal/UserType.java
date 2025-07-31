@@ -23,15 +23,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import com.google.common.base.Objects;
+//import org.miniCassandra.cql3.CQL3Type;
+import org.miniCassandra.exceptions.ConfigurationException;
+import org.miniCassandra.exceptions.SyntaxException;
+import org.miniCassandra.serializers.MarshalException;
+import org.miniCassandra.serializers.TypeSerializer;
+import org.miniCassandra.serializers.UserTypeSerializer;
+import org.miniCassandra.utils.ByteBufferUtil;
+import org.miniCassandra.utils.Pair;
 
-import org.apache.cassandra.cql3.*;
-import org.apache.cassandra.exceptions.ConfigurationException;
-import org.apache.cassandra.exceptions.SyntaxException;
-import org.apache.cassandra.serializers.MarshalException;
-import org.apache.cassandra.serializers.TypeSerializer;
-import org.apache.cassandra.serializers.UserTypeSerializer;
-import org.apache.cassandra.utils.ByteBufferUtil;
-import org.apache.cassandra.utils.Pair;
 
 /**
  * A user defined type.
@@ -117,80 +117,80 @@ public class UserType extends TupleType
         return UTF8Type.instance.compose(name);
     }
 
-    @Override
-    public Term fromJSONObject(Object parsed) throws MarshalException
-    {
-        if (parsed instanceof String)
-            parsed = Json.decodeJson((String) parsed);
-
-        if (!(parsed instanceof Map))
-            throw new MarshalException(String.format(
-                    "Expected a map, but got a %s: %s", parsed.getClass().getSimpleName(), parsed));
-
-        Map<String, Object> map = (Map<String, Object>) parsed;
-
-        Json.handleCaseSensitivity(map);
-
-        List<Term> terms = new ArrayList<>(types.size());
-
-        Set keys = map.keySet();
-        assert keys.isEmpty() || keys.iterator().next() instanceof String;
-
-        int foundValues = 0;
-        for (int i = 0; i < types.size(); i++)
-        {
-            Object value = map.get(stringFieldNames.get(i));
-            if (value == null)
-            {
-                terms.add(Constants.NULL_VALUE);
-            }
-            else
-            {
-                terms.add(types.get(i).fromJSONObject(value));
-                foundValues += 1;
-            }
-        }
-
-        // check for extra, unrecognized fields
-        if (foundValues != map.size())
-        {
-            for (Object fieldName : keys)
-            {
-                if (!stringFieldNames.contains(fieldName))
-                    throw new MarshalException(String.format(
-                            "Unknown field '%s' in value of user defined type %s", fieldName, getNameAsString()));
-            }
-        }
-
-        return new UserTypes.DelayedValue(this, terms);
-    }
-
-    @Override
-    public String toJSONString(ByteBuffer buffer, int protocolVersion)
-    {
-        ByteBuffer[] buffers = split(buffer);
-        StringBuilder sb = new StringBuilder("{");
-        for (int i = 0; i < types.size(); i++)
-        {
-            if (i > 0)
-                sb.append(", ");
-
-            String name = stringFieldNames.get(i);
-            if (!name.equals(name.toLowerCase(Locale.US)))
-                name = "\"" + name + "\"";
-
-            sb.append('"');
-            sb.append(Json.quoteAsJsonString(name));
-            sb.append("\": ");
-
-            ByteBuffer valueBuffer = (i >= buffers.length) ? null : buffers[i];
-            if (valueBuffer == null)
-                sb.append("null");
-            else
-                sb.append(types.get(i).toJSONString(valueBuffer, protocolVersion));
-        }
-        return sb.append("}").toString();
-    }
+//    @Override
+//    public Term fromJSONObject(Object parsed) throws MarshalException
+//    {
+//        if (parsed instanceof String)
+//            parsed = Json.decodeJson((String) parsed);
+//
+//        if (!(parsed instanceof Map))
+//            throw new MarshalException(String.format(
+//                    "Expected a map, but got a %s: %s", parsed.getClass().getSimpleName(), parsed));
+//
+//        Map<String, Object> map = (Map<String, Object>) parsed;
+//
+//        Json.handleCaseSensitivity(map);
+//
+//        List<Term> terms = new ArrayList<>(types.size());
+//
+//        Set keys = map.keySet();
+//        assert keys.isEmpty() || keys.iterator().next() instanceof String;
+//
+//        int foundValues = 0;
+//        for (int i = 0; i < types.size(); i++)
+//        {
+//            Object value = map.get(stringFieldNames.get(i));
+//            if (value == null)
+//            {
+//                terms.add(Constants.NULL_VALUE);
+//            }
+//            else
+//            {
+//                terms.add(types.get(i).fromJSONObject(value));
+//                foundValues += 1;
+//            }
+//        }
+//
+//        // check for extra, unrecognized fields
+//        if (foundValues != map.size())
+//        {
+//            for (Object fieldName : keys)
+//            {
+//                if (!stringFieldNames.contains(fieldName))
+//                    throw new MarshalException(String.format(
+//                            "Unknown field '%s' in value of user defined type %s", fieldName, getNameAsString()));
+//            }
+//        }
+//
+//        return new UserTypes.DelayedValue(this, terms);
+//    }
+//
+//    @Override
+//    public String toJSONString(ByteBuffer buffer, int protocolVersion)
+//    {
+//        ByteBuffer[] buffers = split(buffer);
+//        StringBuilder sb = new StringBuilder("{");
+//        for (int i = 0; i < types.size(); i++)
+//        {
+//            if (i > 0)
+//                sb.append(", ");
+//
+//            String name = stringFieldNames.get(i);
+//            if (!name.equals(name.toLowerCase(Locale.US)))
+//                name = "\"" + name + "\"";
+//
+//            sb.append('"');
+//            sb.append(Json.quoteAsJsonString(name));
+//            sb.append("\": ");
+//
+//            ByteBuffer valueBuffer = (i >= buffers.length) ? null : buffers[i];
+//            if (valueBuffer == null)
+//                sb.append("null");
+//            else
+//                sb.append(types.get(i).toJSONString(valueBuffer, protocolVersion));
+//        }
+//        return sb.append("}").toString();
+//    }
 
     @Override
     public int hashCode()
@@ -208,11 +208,11 @@ public class UserType extends TupleType
         return keyspace.equals(that.keyspace) && name.equals(that.name) && fieldNames.equals(that.fieldNames) && types.equals(that.types);
     }
 
-    @Override
-    public CQL3Type asCQL3Type()
-    {
-        return CQL3Type.UserDefined.create(this);
-    }
+//    @Override
+//    public CQL3Type asCQL3Type()
+//    {
+//        return CQL3Type.UserDefined.create(this);
+//    }
 
     @Override
     public boolean referencesUserType(String userTypeName)

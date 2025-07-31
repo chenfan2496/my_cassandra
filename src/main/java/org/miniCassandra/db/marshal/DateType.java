@@ -20,16 +20,13 @@ package org.miniCassandra.db.marshal;
 import java.nio.ByteBuffer;
 import java.util.Date;
 
-import org.apache.cassandra.cql3.Constants;
-import org.apache.cassandra.cql3.Term;
+import org.miniCassandra.serializers.MarshalException;
+import org.miniCassandra.serializers.TimestampSerializer;
+import org.miniCassandra.serializers.TypeSerializer;
+import org.miniCassandra.utils.ByteBufferUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.cassandra.cql3.CQL3Type;
-import org.apache.cassandra.serializers.TypeSerializer;
-import org.apache.cassandra.serializers.TimestampSerializer;
-import org.apache.cassandra.serializers.MarshalException;
-import org.apache.cassandra.utils.ByteBufferUtil;
 
 /**
  * This is the old version of TimestampType, but has been replaced as it wasn't comparing pre-epoch timestamps
@@ -58,23 +55,23 @@ public class DateType extends AbstractType<Date>
       return ByteBufferUtil.bytes(TimestampSerializer.dateStringToTimestamp(source));
     }
 
-    @Override
-    public Term fromJSONObject(Object parsed) throws MarshalException
-    {
-        if (parsed instanceof Long)
-            return new Constants.Value(ByteBufferUtil.bytes((Long) parsed));
-
-        try
-        {
-            return new Constants.Value(TimestampType.instance.fromString((String) parsed));
-        }
-        catch (ClassCastException exc)
-        {
-            throw new MarshalException(String.format(
-                    "Expected a long or a datestring representation of a date value, but got a %s: %s",
-                    parsed.getClass().getSimpleName(), parsed));
-        }
-    }
+//    @Override
+//    public Term fromJSONObject(Object parsed) throws MarshalException
+//    {
+//        if (parsed instanceof Long)
+//            return new Constants.Value(ByteBufferUtil.bytes((Long) parsed));
+//
+//        try
+//        {
+//            return new Constants.Value(TimestampType.instance.fromString((String) parsed));
+//        }
+//        catch (ClassCastException exc)
+//        {
+//            throw new MarshalException(String.format(
+//                    "Expected a long or a datestring representation of a date value, but got a %s: %s",
+//                    parsed.getClass().getSimpleName(), parsed));
+//        }
+//    }
 
     @Override
     public String toJSONString(ByteBuffer buffer, int protocolVersion)
@@ -106,11 +103,10 @@ public class DateType extends AbstractType<Date>
         return this == otherType || otherType == TimestampType.instance || otherType == LongType.instance;
     }
 
-    @Override
-    public CQL3Type asCQL3Type()
-    {
-        return CQL3Type.Native.TIMESTAMP;
-    }
+//    public CQL3Type asCQL3Type()
+//    {
+//        return CQL3Type.Native.TIMESTAMP;
+//    }
 
     public TypeSerializer<Date> getSerializer()
     {

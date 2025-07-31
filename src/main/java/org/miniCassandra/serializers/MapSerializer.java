@@ -22,7 +22,7 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.util.*;
 
-import org.apache.cassandra.db.marshal.AbstractType;
+import org.miniCassandra.db.marshal.AbstractType;
 import org.miniCassandra.transport.Server;
 import org.miniCassandra.utils.Pair;
 

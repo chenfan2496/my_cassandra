@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 package org.miniCassandra.schema;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
 
@@ -29,36 +30,52 @@ public final class KeyspaceMetadata
     public final Tables tables;
     //public final Views views;
     public final Types types;
-    public final Functions functions;
+    //public final Functions functions;
 
-    private KeyspaceMetadata(String name, KeyspaceParams params, Tables tables,  Types types, Functions functions)
+    private KeyspaceMetadata(String name, KeyspaceParams params, Tables tables,  Types types)
     {
         this.name = name;
         this.params = params;
         this.tables = tables;
         //this.views = views;
         this.types = types;
-        this.functions = functions;
+        // this.functions = functions;
     }
+
+
+//    private KeyspaceMetadata(String name, KeyspaceParams params, Tables tables,  Types types, Functions functions)
+//    {
+//        this.name = name;
+//        this.params = params;
+//        this.tables = tables;
+//        //this.views = views;
+//        this.types = types;
+//       // this.functions = functions;
+//    }
 
     public static KeyspaceMetadata create(String name, KeyspaceParams params)
     {
-        return new KeyspaceMetadata(name, params, Tables.none(), Types.none(), Functions.none());
+        return new KeyspaceMetadata(name, params, Tables.none(), Types.none());
     }
 
     public static KeyspaceMetadata create(String name, KeyspaceParams params, Tables tables)
     {
-        return new KeyspaceMetadata(name, params, tables, Types.none(), Functions.none());
+        return new KeyspaceMetadata(name, params, tables, Types.none());
     }
 
-    public static KeyspaceMetadata create(String name, KeyspaceParams params, Tables tables, Types types, Functions functions)
+//    public static KeyspaceMetadata create(String name, KeyspaceParams params, Tables tables, Types types, Functions functions)
+//    {
+//        return new KeyspaceMetadata(name, params, tables, types, functions);
+//    }
+
+    public static KeyspaceMetadata create(String name, KeyspaceParams params, Tables tables, Types types)
     {
-        return new KeyspaceMetadata(name, params, tables, types, functions);
+        return new KeyspaceMetadata(name, params, tables, types);
     }
 
     public KeyspaceMetadata withSwapped(KeyspaceParams params)
     {
-        return new KeyspaceMetadata(name, params, tables, types, functions);
+        return new KeyspaceMetadata(name, params, tables, types);
     }
 
 //    public KeyspaceMetadata withSwapped(Tables regular)
@@ -73,13 +90,13 @@ public final class KeyspaceMetadata
 
     public KeyspaceMetadata withSwapped(Types types)
     {
-        return new KeyspaceMetadata(name, params, tables,types, functions);
+        return new KeyspaceMetadata(name, params, tables,types);
     }
 
-    public KeyspaceMetadata withSwapped(Functions functions)
-    {
-        return new KeyspaceMetadata(name, params, tables, types, functions);
-    }
+//    public KeyspaceMetadata withSwapped(Functions functions)
+//    {
+//        return new KeyspaceMetadata(name, params, tables, types, functions);
+//    }
 
 //    public Iterable<CFMetaData> tablesAndViews()
 //    {
@@ -118,7 +135,7 @@ public final class KeyspaceMetadata
     public int hashCode()
     {
        // return Objects.hashCode(name, params, tables, views, functions, types);
-        return Objects.hashCode(name, params, tables,functions, types);
+        return Objects.hashCode(name, params, tables, types);
 
     }
 
@@ -137,19 +154,19 @@ public final class KeyspaceMetadata
             && params.equals(other.params)
             && tables.equals(other.tables)
             //&& views.equals(other.views)
-            && functions.equals(other.functions)
+            //&& functions.equals(other.functions)
             && types.equals(other.types);
     }
 
     @Override
     public String toString()
     {
-        return Objects.toStringHelper(this)
+        return MoreObjects.toStringHelper(this)
                       .add("name", name)
                       .add("params", params)
                       .add("tables", tables)
                      // .add("views", views)
-                      .add("functions", functions)
+                      //.add("functions", functions)
                       .add("types", types)
                       .toString();
     }

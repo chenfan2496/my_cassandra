@@ -26,15 +26,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import com.google.common.collect.ImmutableList;
+import org.miniCassandra.cql3.ColumnIdentifier;
+import org.miniCassandra.db.io.util.DataOutputBuffer;
+import org.miniCassandra.db.io.util.DataOutputBufferFixed;
+import org.miniCassandra.exceptions.ConfigurationException;
+import org.miniCassandra.exceptions.SyntaxException;
+import org.miniCassandra.serializers.MarshalException;
+import org.miniCassandra.utils.ByteBufferUtil;
 
-import org.apache.cassandra.cql3.ColumnIdentifier;
-import org.apache.cassandra.cql3.Operator;
-import org.apache.cassandra.exceptions.ConfigurationException;
-import org.apache.cassandra.exceptions.SyntaxException;
-import org.apache.cassandra.io.util.DataOutputBuffer;
-import org.apache.cassandra.io.util.DataOutputBufferFixed;
-import org.apache.cassandra.serializers.MarshalException;
-import org.apache.cassandra.utils.ByteBufferUtil;
 
 /*
  * The encoding of a CompositeType column name should be:
@@ -467,33 +466,33 @@ public class CompositeType extends AbstractCompositeType
             return bb;
         }
 
-        public ByteBuffer buildForRelation(Operator op)
-        {
-            /*
-             * Given the rules for eoc (end-of-component, see AbstractCompositeType.compare()),
-             * We can select:
-             *   - = 'a' by using <'a'><0>
-             *   - < 'a' by using <'a'><-1>
-             *   - <= 'a' by using <'a'><1>
-             *   - > 'a' by using <'a'><1>
-             *   - >= 'a' by using <'a'><0>
-             */
-            int current = components.size() - 1;
-            switch (op)
-            {
-                case LT:
-                    endOfComponents[current] = (byte) -1;
-                    break;
-                case GT:
-                case LTE:
-                    endOfComponents[current] = (byte) 1;
-                    break;
-                default:
-                    endOfComponents[current] = (byte) 0;
-                    break;
-            }
-            return build();
-        }
+//        public ByteBuffer buildForRelation(Operator op)
+//        {
+//            /*
+//             * Given the rules for eoc (end-of-component, see AbstractCompositeType.compare()),
+//             * We can select:
+//             *   - = 'a' by using <'a'><0>
+//             *   - < 'a' by using <'a'><-1>
+//             *   - <= 'a' by using <'a'><1>
+//             *   - > 'a' by using <'a'><1>
+//             *   - >= 'a' by using <'a'><0>
+//             */
+//            int current = components.size() - 1;
+//            switch (op)
+//            {
+//                case LT:
+//                    endOfComponents[current] = (byte) -1;
+//                    break;
+//                case GT:
+//                case LTE:
+//                    endOfComponents[current] = (byte) 1;
+//                    break;
+//                default:
+//                    endOfComponents[current] = (byte) 0;
+//                    break;
+//            }
+//            return build();
+//        }
 
         public Builder copy()
         {

@@ -24,12 +24,14 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.google.common.base.Objects;
-
-import org.apache.cassandra.cql3.*;
-import org.apache.cassandra.exceptions.ConfigurationException;
-import org.apache.cassandra.exceptions.SyntaxException;
-import org.apache.cassandra.serializers.*;
-import org.apache.cassandra.utils.ByteBufferUtil;
+//import org.miniCassandra.cql3.CQL3Type;
+import org.miniCassandra.exceptions.ConfigurationException;
+import org.miniCassandra.exceptions.SyntaxException;
+import org.miniCassandra.serializers.CollectionSerializer;
+import org.miniCassandra.serializers.MarshalException;
+import org.miniCassandra.serializers.TupleSerializer;
+import org.miniCassandra.serializers.TypeSerializer;
+import org.miniCassandra.utils.ByteBufferUtil;
 
 /**
  * This is essentially like a CompositeType, but it's not primarily meant for comparison, just
@@ -234,40 +236,40 @@ public class TupleType extends AbstractType<ByteBuffer>
         return buildValue(fields);
     }
 
-    @Override
-    public Term fromJSONObject(Object parsed) throws MarshalException
-    {
-        if (parsed instanceof String)
-            parsed = Json.decodeJson((String) parsed);
-
-        if (!(parsed instanceof List))
-            throw new MarshalException(String.format(
-                    "Expected a list representation of a tuple, but got a %s: %s", parsed.getClass().getSimpleName(), parsed));
-
-        List list = (List) parsed;
-
-        if (list.size() > types.size())
-            throw new MarshalException(String.format("Tuple contains extra items (expected %s): %s", types.size(), parsed));
-        else if (types.size() > list.size())
-            throw new MarshalException(String.format("Tuple is missing items (expected %s): %s", types.size(), parsed));
-
-        List<Term> terms = new ArrayList<>(list.size());
-        Iterator<AbstractType<?>> typeIterator = types.iterator();
-        for (Object element : list)
-        {
-            if (element == null)
-            {
-                typeIterator.next();
-                terms.add(Constants.NULL_VALUE);
-            }
-            else
-            {
-                terms.add(typeIterator.next().fromJSONObject(element));
-            }
-        }
-
-        return new Tuples.DelayedValue(this, terms);
-    }
+//    @Override
+//    public Term fromJSONObject(Object parsed) throws MarshalException
+//    {
+//        if (parsed instanceof String)
+//            parsed = Json.decodeJson((String) parsed);
+//
+//        if (!(parsed instanceof List))
+//            throw new MarshalException(String.format(
+//                    "Expected a list representation of a tuple, but got a %s: %s", parsed.getClass().getSimpleName(), parsed));
+//
+//        List list = (List) parsed;
+//
+//        if (list.size() > types.size())
+//            throw new MarshalException(String.format("Tuple contains extra items (expected %s): %s", types.size(), parsed));
+//        else if (types.size() > list.size())
+//            throw new MarshalException(String.format("Tuple is missing items (expected %s): %s", types.size(), parsed));
+//
+//        List<Term> terms = new ArrayList<>(list.size());
+//        Iterator<AbstractType<?>> typeIterator = types.iterator();
+//        for (Object element : list)
+//        {
+//            if (element == null)
+//            {
+//                typeIterator.next();
+//                terms.add(Constants.NULL_VALUE);
+//            }
+//            else
+//            {
+//                terms.add(typeIterator.next().fromJSONObject(element));
+//            }
+//        }
+//
+//        return new Tuples.DelayedValue(this, terms);
+//    }
 
     @Override
     public String toJSONString(ByteBuffer buffer, int protocolVersion)
@@ -351,11 +353,10 @@ public class TupleType extends AbstractType<ByteBuffer>
         return types.equals(that.types);
     }
 
-    @Override
-    public CQL3Type asCQL3Type()
-    {
-        return CQL3Type.Tuple.create(this);
-    }
+//    public CQL3Type asCQL3Type()
+//    {
+//        return CQL3Type.Tuple.create(this);
+//    }
 
     @Override
     public String toString()

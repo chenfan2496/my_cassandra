@@ -17,16 +17,14 @@
  */
 package org.miniCassandra.db.marshal;
 
+//import org.miniCassandra.cql3.CQL3Type;
+import org.miniCassandra.serializers.Int32Serializer;
+import org.miniCassandra.serializers.MarshalException;
+import org.miniCassandra.serializers.TypeSerializer;
+import org.miniCassandra.utils.ByteBufferUtil;
+
 import java.nio.ByteBuffer;
 import java.util.Objects;
-
-import org.apache.cassandra.cql3.CQL3Type;
-import org.apache.cassandra.cql3.Constants;
-import org.apache.cassandra.cql3.Term;
-import org.apache.cassandra.serializers.TypeSerializer;
-import org.apache.cassandra.serializers.Int32Serializer;
-import org.apache.cassandra.serializers.MarshalException;
-import org.apache.cassandra.utils.ByteBufferUtil;
 
 public class Int32Type extends AbstractType<Integer>
 {
@@ -74,26 +72,26 @@ public class Int32Type extends AbstractType<Integer>
         return decompose(int32Type);
     }
 
-    @Override
-    public Term fromJSONObject(Object parsed) throws MarshalException
-    {
-        try
-        {
-            if (parsed instanceof String)
-                return new Constants.Value(fromString((String) parsed));
-
-            Number parsedNumber = (Number) parsed;
-            if (!(parsedNumber instanceof Integer))
-                throw new MarshalException(String.format("Expected an int value, but got a %s: %s", parsed.getClass().getSimpleName(), parsed));
-
-            return new Constants.Value(getSerializer().serialize(parsedNumber.intValue()));
-        }
-        catch (ClassCastException exc)
-        {
-            throw new MarshalException(String.format(
-                    "Expected an int value, but got a %s: %s", parsed.getClass().getSimpleName(), parsed));
-        }
-    }
+//    @Override
+//    public Term fromJSONObject(Object parsed) throws MarshalException
+//    {
+//        try
+//        {
+//            if (parsed instanceof String)
+//                return new Constants.Value(fromString((String) parsed));
+//
+//            Number parsedNumber = (Number) parsed;
+//            if (!(parsedNumber instanceof Integer))
+//                throw new MarshalException(String.format("Expected an int value, but got a %s: %s", parsed.getClass().getSimpleName(), parsed));
+//
+//            return new Constants.Value(getSerializer().serialize(parsedNumber.intValue()));
+//        }
+//        catch (ClassCastException exc)
+//        {
+//            throw new MarshalException(String.format(
+//                    "Expected an int value, but got a %s: %s", parsed.getClass().getSimpleName(), parsed));
+//        }
+//    }
 
     @Override
     public String toJSONString(ByteBuffer buffer, int protocolVersion)
@@ -101,10 +99,10 @@ public class Int32Type extends AbstractType<Integer>
         return Objects.toString(getSerializer().deserialize(buffer), "\"\"");
     }
 
-    public CQL3Type asCQL3Type()
-    {
-        return CQL3Type.Native.INT;
-    }
+//    public CQL3Type asCQL3Type()
+//    {
+//        return CQL3Type.Native.INT;
+//    }
 
     public TypeSerializer<Integer> getSerializer()
     {

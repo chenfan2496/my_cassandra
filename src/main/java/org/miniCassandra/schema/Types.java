@@ -20,8 +20,6 @@ package org.miniCassandra.schema;
 import java.nio.ByteBuffer;
 import java.util.*;
 
-import javax.annotation.Nullable;
-
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.MapDifference;
@@ -30,6 +28,7 @@ import com.google.common.collect.Multimap;
 
 import org.miniCassandra.db.marshal.AbstractType;
 import org.miniCassandra.db.marshal.UserType;
+import org.miniCassandra.exceptions.ConfigurationException;
 import org.miniCassandra.utils.ByteBufferUtil;
 
 import static java.lang.String.format;
@@ -101,7 +100,6 @@ public final class Types implements Iterable<UserType>
      * @param name a non-qualified type name
      * @return null if the type name is not found; the found {@link UserType} otherwise
      */
-    @Nullable
     public UserType getNullable(ByteBuffer name)
     {
         return types.get(name);
@@ -284,20 +282,20 @@ public final class Types implements Iterable<UserType>
 //                return fieldTypes.stream().anyMatch(t -> t.referencesUserType(other.name));
 //            }
 
-//            UserType prepare(String keyspace, Types types)
-//            {
-//                List<ByteBuffer> preparedFieldNames =
-//                    fieldNames.stream()
-//                              .map(ByteBufferUtil::bytes)
-//                              .collect(toList());
-//
-//                List<AbstractType<?>> preparedFieldTypes =
-//                    fieldTypes.stream()
-//                              .map(t -> t.prepareInternal(keyspace, types).getType())
-//                              .collect(toList());
-//
-//                return new UserType(keyspace, bytes(name), preparedFieldNames, preparedFieldTypes);
-//            }
+            UserType prepare(String keyspace, Types types)
+            {
+                List<ByteBuffer> preparedFieldNames =
+                    fieldNames.stream()
+                              .map(ByteBufferUtil::bytes)
+                              .collect(toList());
+
+                List<AbstractType<?>> preparedFieldTypes =
+                    fieldTypes.stream()
+                              .map(t -> t.prepareInternal(keyspace, types).getType())
+                              .collect(toList());
+
+                return new UserType(keyspace, bytes(name), preparedFieldNames, preparedFieldTypes);
+            }
 
             @Override
             public int hashCode()

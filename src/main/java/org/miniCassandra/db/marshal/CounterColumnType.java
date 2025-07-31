@@ -17,15 +17,13 @@
  */
 package org.miniCassandra.db.marshal;
 
+import org.miniCassandra.serializers.CounterSerializer;
+import org.miniCassandra.serializers.MarshalException;
+import org.miniCassandra.serializers.TypeSerializer;
+import org.miniCassandra.utils.ByteBufferUtil;
+
 import java.nio.ByteBuffer;
 
-import org.apache.cassandra.cql3.CQL3Type;
-import org.apache.cassandra.cql3.Term;
-import org.apache.cassandra.db.context.CounterContext;
-import org.apache.cassandra.serializers.TypeSerializer;
-import org.apache.cassandra.serializers.CounterSerializer;
-import org.apache.cassandra.serializers.MarshalException;
-import org.apache.cassandra.utils.ByteBufferUtil;
 
 public class CounterColumnType extends AbstractType<Long>
 {
@@ -43,23 +41,23 @@ public class CounterColumnType extends AbstractType<Long>
         return true;
     }
 
-    @Override
-    public Long compose(ByteBuffer bytes)
-    {
-        return CounterContext.instance().total(bytes);
-    }
+//    @Override
+//    public Long compose(ByteBuffer bytes)
+//    {
+//        return CounterContext.instance().total(bytes);
+//    }
 
     @Override
     public ByteBuffer decompose(Long value)
     {
         return ByteBufferUtil.bytes(value);
     }
-
-    @Override
-    public void validateCellValue(ByteBuffer cellValue) throws MarshalException
-    {
-        CounterContext.instance().validateContext(cellValue);
-    }
+//
+//    @Override
+//    public void validateCellValue(ByteBuffer cellValue) throws MarshalException
+//    {
+//        CounterContext.instance().validateContext(cellValue);
+//    }
 
     public String getString(ByteBuffer bytes)
     {
@@ -70,12 +68,12 @@ public class CounterColumnType extends AbstractType<Long>
     {
         return ByteBufferUtil.hexToBytes(source);
     }
-
-    @Override
-    public Term fromJSONObject(Object parsed)
-    {
-        throw new UnsupportedOperationException();
-    }
+//
+//    @Override
+//    public Term fromJSONObject(Object parsed)
+//    {
+//        throw new UnsupportedOperationException();
+//    }
 
     @Override
     public String toJSONString(ByteBuffer buffer, int protocolVersion)
@@ -83,10 +81,10 @@ public class CounterColumnType extends AbstractType<Long>
         return CounterSerializer.instance.deserialize(buffer).toString();
     }
 
-    public CQL3Type asCQL3Type()
-    {
-        return CQL3Type.Native.COUNTER;
-    }
+//    public CQL3Type asCQL3Type()
+//    {
+//        return CQL3Type.Native.COUNTER;
+//    }
 
     public TypeSerializer<Long> getSerializer()
     {

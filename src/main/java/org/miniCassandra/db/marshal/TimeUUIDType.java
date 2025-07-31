@@ -17,15 +17,13 @@
  */
 package org.miniCassandra.db.marshal;
 
+//import org.miniCassandra.cql3.CQL3Type;
+import org.miniCassandra.serializers.MarshalException;
+import org.miniCassandra.serializers.TimeUUIDSerializer;
+import org.miniCassandra.serializers.TypeSerializer;
+
 import java.nio.ByteBuffer;
 import java.util.UUID;
-
-import org.apache.cassandra.cql3.CQL3Type;
-import org.apache.cassandra.cql3.Constants;
-import org.apache.cassandra.cql3.Term;
-import org.apache.cassandra.serializers.TypeSerializer;
-import org.apache.cassandra.serializers.MarshalException;
-import org.apache.cassandra.serializers.TimeUUIDSerializer;
 
 public class TimeUUIDType extends AbstractType<UUID>
 {
@@ -105,24 +103,24 @@ public class TimeUUIDType extends AbstractType<UUID>
         return parsed;
     }
 
-    @Override
-    public Term fromJSONObject(Object parsed) throws MarshalException
-    {
-        try
-        {
-            return new Constants.Value(fromString((String) parsed));
-        }
-        catch (ClassCastException exc)
-        {
-            throw new MarshalException(
-                    String.format("Expected a string representation of a timeuuid, but got a %s: %s", parsed.getClass().getSimpleName(), parsed));
-        }
-    }
+//    @Override
+//    public Term fromJSONObject(Object parsed) throws MarshalException
+//    {
+//        try
+//        {
+//            return new Constants.Value(fromString((String) parsed));
+//        }
+//        catch (ClassCastException exc)
+//        {
+//            throw new MarshalException(
+//                    String.format("Expected a string representation of a timeuuid, but got a %s: %s", parsed.getClass().getSimpleName(), parsed));
+//        }
+//    }
 
-    public CQL3Type asCQL3Type()
-    {
-        return CQL3Type.Native.TIMEUUID;
-    }
+//    public CQL3Type asCQL3Type()
+//    {
+//        return CQL3Type.Native.TIMEUUID;
+//    }
 
     public TypeSerializer<UUID> getSerializer()
     {

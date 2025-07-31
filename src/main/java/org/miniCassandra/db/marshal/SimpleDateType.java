@@ -17,15 +17,14 @@
  */
 package org.miniCassandra.db.marshal;
 
+//import org.miniCassandra.cql3.CQL3Type;
+import org.miniCassandra.serializers.MarshalException;
+import org.miniCassandra.serializers.SimpleDateSerializer;
+import org.miniCassandra.serializers.TypeSerializer;
+import org.miniCassandra.utils.ByteBufferUtil;
+
 import java.nio.ByteBuffer;
 
-import org.apache.cassandra.cql3.CQL3Type;
-import org.apache.cassandra.cql3.Constants;
-import org.apache.cassandra.cql3.Term;
-import org.apache.cassandra.serializers.MarshalException;
-import org.apache.cassandra.serializers.SimpleDateSerializer;
-import org.apache.cassandra.serializers.TypeSerializer;
-import org.apache.cassandra.utils.ByteBufferUtil;
 
 public class SimpleDateType extends AbstractType<Integer>
 {
@@ -54,19 +53,19 @@ public class SimpleDateType extends AbstractType<Integer>
         return this == otherType || otherType == Int32Type.instance;
     }
 
-    public Term fromJSONObject(Object parsed) throws MarshalException
-    {
-        try
-        {
-            return new Constants.Value(fromString((String) parsed));
-        }
-        catch (ClassCastException exc)
-        {
-            throw new MarshalException(String.format(
-                    "Expected a string representation of a date value, but got a %s: %s",
-                    parsed.getClass().getSimpleName(), parsed));
-        }
-    }
+//    public Term fromJSONObject(Object parsed) throws MarshalException
+//    {
+//        try
+//        {
+//            return new Constants.Value(fromString((String) parsed));
+//        }
+//        catch (ClassCastException exc)
+//        {
+//            throw new MarshalException(String.format(
+//                    "Expected a string representation of a date value, but got a %s: %s",
+//                    parsed.getClass().getSimpleName(), parsed));
+//        }
+//    }
 
     @Override
     public String toJSONString(ByteBuffer buffer, int protocolVersion)
@@ -74,11 +73,10 @@ public class SimpleDateType extends AbstractType<Integer>
         return '"' + SimpleDateSerializer.instance.toString(SimpleDateSerializer.instance.deserialize(buffer)) + '"';
     }
 
-    @Override
-    public CQL3Type asCQL3Type()
-    {
-        return CQL3Type.Native.DATE;
-    }
+//    public CQL3Type asCQL3Type()
+//    {
+//        return CQL3Type.Native.DATE;
+//    }
 
     public TypeSerializer<Integer> getSerializer()
     {

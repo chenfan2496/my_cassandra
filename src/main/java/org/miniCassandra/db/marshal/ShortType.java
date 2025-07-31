@@ -17,16 +17,14 @@
  */
 package org.miniCassandra.db.marshal;
 
+//import org.miniCassandra.cql3.CQL3Type;
+import org.miniCassandra.serializers.MarshalException;
+import org.miniCassandra.serializers.ShortSerializer;
+import org.miniCassandra.serializers.TypeSerializer;
+import org.miniCassandra.utils.ByteBufferUtil;
+
 import java.nio.ByteBuffer;
 import java.util.Objects;
-
-import org.apache.cassandra.cql3.CQL3Type;
-import org.apache.cassandra.cql3.Constants;
-import org.apache.cassandra.cql3.Term;
-import org.apache.cassandra.serializers.MarshalException;
-import org.apache.cassandra.serializers.ShortSerializer;
-import org.apache.cassandra.serializers.TypeSerializer;
-import org.apache.cassandra.utils.ByteBufferUtil;
 
 public class ShortType extends AbstractType<Short>
 {
@@ -65,15 +63,15 @@ public class ShortType extends AbstractType<Short>
 
         return decompose(s);
     }
-
-    public Term fromJSONObject(Object parsed) throws MarshalException
-    {
-        if (parsed instanceof String || parsed instanceof Number)
-            return new Constants.Value(fromString(String.valueOf(parsed)));
-
-        throw new MarshalException(String.format(
-                "Expected a short value, but got a %s: %s", parsed.getClass().getSimpleName(), parsed));
-    }
+//
+//    public Term fromJSONObject(Object parsed) throws MarshalException
+//    {
+//        if (parsed instanceof String || parsed instanceof Number)
+//            return new Constants.Value(fromString(String.valueOf(parsed)));
+//
+//        throw new MarshalException(String.format(
+//                "Expected a short value, but got a %s: %s", parsed.getClass().getSimpleName(), parsed));
+//    }
 
     @Override
     public String toJSONString(ByteBuffer buffer, int protocolVersion)
@@ -81,11 +79,10 @@ public class ShortType extends AbstractType<Short>
         return Objects.toString(getSerializer().deserialize(buffer), "\"\"");
     }
 
-    @Override
-    public CQL3Type asCQL3Type()
-    {
-        return CQL3Type.Native.SMALLINT;
-    }
+//    public CQL3Type asCQL3Type()
+//    {
+//        return CQL3Type.Native.SMALLINT;
+//    }
 
     public TypeSerializer<Short> getSerializer()
     {

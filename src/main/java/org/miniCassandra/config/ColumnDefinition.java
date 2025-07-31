@@ -27,12 +27,15 @@ import com.google.common.collect.Collections2;
 
 
 import org.github.jamm.Unmetered;
+import org.miniCassandra.cql3.ColumnIdentifier;
 import org.miniCassandra.cql3.ColumnSpecification;
 import org.miniCassandra.db.marshal.AbstractType;
 import org.miniCassandra.db.marshal.CollectionType;
+import org.miniCassandra.db.marshal.UserType;
 import org.miniCassandra.db.rows.Cell;
 import org.miniCassandra.db.rows.CellPath;
 import org.miniCassandra.db.rows.ColumnData;
+import org.miniCassandra.serializers.MarshalException;
 
 @Unmetered
 public class ColumnDefinition extends ColumnSpecification implements Comparable<ColumnDefinition>
@@ -266,16 +269,16 @@ public class ColumnDefinition extends ColumnSpecification implements Comparable<
         return Objects.hashCode(ksName, cfName, name, type, kind, position);
     }
 
-    @Override
-    public String toString()
-    {
-        return Objects.toStringHelper(this)
-                      .add("name", name)
-                      .add("type", type)
-                      .add("kind", kind)
-                      .add("position", position)
-                      .toString();
-    }
+//    @Override
+//    public String toString()
+//    {
+//        return Objects.toStringHelper(this)
+//                      .add("name", name)
+//                      .add("type", type)
+//                      .add("kind", kind)
+//                      .add("position", position)
+//                      .toString();
+//    }
 
     public boolean isPrimaryKeyColumn()
     {

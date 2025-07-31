@@ -17,16 +17,15 @@
  */
 package org.miniCassandra.db.marshal;
 
+//import org.miniCassandra.cql3.CQL3Type;
+import org.miniCassandra.serializers.InetAddressSerializer;
+import org.miniCassandra.serializers.MarshalException;
+import org.miniCassandra.serializers.TypeSerializer;
+import org.miniCassandra.utils.ByteBufferUtil;
+
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 
-import org.apache.cassandra.cql3.CQL3Type;
-import org.apache.cassandra.cql3.Constants;
-import org.apache.cassandra.cql3.Term;
-import org.apache.cassandra.serializers.TypeSerializer;
-import org.apache.cassandra.serializers.InetAddressSerializer;
-import org.apache.cassandra.serializers.MarshalException;
-import org.apache.cassandra.utils.ByteBufferUtil;
 
 public class InetAddressType extends AbstractType<InetAddress>
 {
@@ -59,19 +58,19 @@ public class InetAddressType extends AbstractType<InetAddress>
         return decompose(address);
     }
 
-    @Override
-    public Term fromJSONObject(Object parsed) throws MarshalException
-    {
-        try
-        {
-            return new Constants.Value(InetAddressType.instance.fromString((String) parsed));
-        }
-        catch (ClassCastException exc)
-        {
-            throw new MarshalException(String.format(
-                    "Expected a string representation of an inet value, but got a %s: %s", parsed.getClass().getSimpleName(), parsed));
-        }
-    }
+//    @Override
+//    public Term fromJSONObject(Object parsed) throws MarshalException
+//    {
+//        try
+//        {
+//            return new Constants.Value(InetAddressType.instance.fromString((String) parsed));
+//        }
+//        catch (ClassCastException exc)
+//        {
+//            throw new MarshalException(String.format(
+//                    "Expected a string representation of an inet value, but got a %s: %s", parsed.getClass().getSimpleName(), parsed));
+//        }
+//    }
 
     private String toString(InetAddress inet)
     {
@@ -84,10 +83,10 @@ public class InetAddressType extends AbstractType<InetAddress>
         return '"' + toString(getSerializer().deserialize(buffer)) + '"';
     }
 
-    public CQL3Type asCQL3Type()
-    {
-        return CQL3Type.Native.INET;
-    }
+//    public CQL3Type asCQL3Type()
+//    {
+//        return CQL3Type.Native.INET;
+//    }
 
     public TypeSerializer<InetAddress> getSerializer()
     {

@@ -20,12 +20,11 @@ package org.miniCassandra.db;
 import java.nio.ByteBuffer;
 import java.util.Comparator;
 
-import org.apache.cassandra.dht.IPartitioner;
-import org.apache.cassandra.dht.Token;
-import org.apache.cassandra.dht.Token.KeyBound;
-import org.apache.cassandra.utils.MurmurHash;
-import org.apache.cassandra.utils.IFilter.FilterKey;
+import org.miniCassandra.dht.IPartitioner;
+import org.miniCassandra.dht.Token;
 import org.miniCassandra.utils.ByteBufferUtil;
+import org.miniCassandra.utils.IFilter;
+import org.miniCassandra.utils.MurmurHash;
 
 /**
  * Represents a decorated key, handy for certain operations
@@ -36,7 +35,7 @@ import org.miniCassandra.utils.ByteBufferUtil;
  * if this matters, you can subclass RP to use a stronger hash, or use a non-lossy tokenization scheme (as in the
  * OrderPreservingPartitioner classes).
  */
-public abstract class DecoratedKey implements PartitionPosition, FilterKey
+public abstract class DecoratedKey implements PartitionPosition, IFilter.FilterKey
 {
     public static final Comparator<DecoratedKey> comparator = new Comparator<DecoratedKey>()
     {
@@ -102,7 +101,7 @@ public abstract class DecoratedKey implements PartitionPosition, FilterKey
         return getToken().getPartitioner();
     }
 
-    public KeyBound minValue()
+    public Token.KeyBound minValue()
     {
         return getPartitioner().getMinimumToken().minKeyBound();
     }

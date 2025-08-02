@@ -27,6 +27,7 @@ import com.google.common.collect.Lists;
 import org.miniCassandra.config.CFMetaData;
 import org.miniCassandra.config.ColumnDefinition;
 //import org.miniCassandra.db.filter.ColumnFilter;
+import org.miniCassandra.db.filter.ColumnFilter;
 import org.miniCassandra.db.rows.*;
 import org.miniCassandra.db.marshal.AbstractType;
 import org.miniCassandra.db.marshal.BytesType;
@@ -94,43 +95,43 @@ public class SerializationHeader
                                        Collections.<ByteBuffer, AbstractType<?>>emptyMap());
     }
 
-    public static SerializationHeader make(CFMetaData metadata, Collection<SSTableReader> sstables)
-    {
-        // The serialization header has to be computed before the start of compaction (since it's used to write)
-        // the result. This means that when compacting multiple sources, we won't have perfectly accurate stats
-        // (for EncodingStats) since compaction may delete, purge and generally merge rows in unknown ways. This is
-        // kind of ok because those stats are only used for optimizing the underlying storage format and so we
-        // just have to strive for as good as possible. Currently, we stick to a relatively naive merge of existing
-        // global stats because it's simple and probably good enough in most situation but we could probably
-        // improve our marging of inaccuracy through the use of more fine-grained stats in the future.
-        // Note however that to avoid seeing our accuracy degrade through successive compactions, we don't base
-        // our stats merging on the compacted files headers, which as we just said can be somewhat inaccurate,
-        // but rather on their stats stored in StatsMetadata that are fully accurate.
-        EncodingStats.Collector stats = new EncodingStats.Collector();
-        PartitionColumns.Builder columns = PartitionColumns.builder();
-        // We need to order the SSTables by descending generation to be sure that we use latest column definitions.
-        for (SSTableReader sstable : orderByDescendingGeneration(sstables))
-        {
-            stats.updateTimestamp(sstable.getMinTimestamp());
-            stats.updateLocalDeletionTime(sstable.getMinLocalDeletionTime());
-            stats.updateTTL(sstable.getMinTTL());
-            if (sstable.header == null)
-                columns.addAll(metadata.partitionColumns());
-            else
-                columns.addAll(sstable.header.columns());
-        }
-        return new SerializationHeader(true, metadata, columns.build(), stats.get());
-    }
-
-    private static Collection<SSTableReader> orderByDescendingGeneration(Collection<SSTableReader> sstables)
-    {
-        if (sstables.size() < 2)
-            return sstables;
-
-        List<SSTableReader> readers = new ArrayList<>(sstables);
-        readers.sort(SSTableReader.generationReverseComparator);
-        return readers;
-    }
+//    public static SerializationHeader make(CFMetaData metadata, Collection<SSTableReader> sstables)
+//    {
+//        // The serialization header has to be computed before the start of compaction (since it's used to write)
+//        // the result. This means that when compacting multiple sources, we won't have perfectly accurate stats
+//        // (for EncodingStats) since compaction may delete, purge and generally merge rows in unknown ways. This is
+//        // kind of ok because those stats are only used for optimizing the underlying storage format and so we
+//        // just have to strive for as good as possible. Currently, we stick to a relatively naive merge of existing
+//        // global stats because it's simple and probably good enough in most situation but we could probably
+//        // improve our marging of inaccuracy through the use of more fine-grained stats in the future.
+//        // Note however that to avoid seeing our accuracy degrade through successive compactions, we don't base
+//        // our stats merging on the compacted files headers, which as we just said can be somewhat inaccurate,
+//        // but rather on their stats stored in StatsMetadata that are fully accurate.
+//        EncodingStats.Collector stats = new EncodingStats.Collector();
+//        PartitionColumns.Builder columns = PartitionColumns.builder();
+//        // We need to order the SSTables by descending generation to be sure that we use latest column definitions.
+//        for (SSTableReader sstable : orderByDescendingGeneration(sstables))
+//        {
+//            stats.updateTimestamp(sstable.getMinTimestamp());
+//            stats.updateLocalDeletionTime(sstable.getMinLocalDeletionTime());
+//            stats.updateTTL(sstable.getMinTTL());
+//            if (sstable.header == null)
+//                columns.addAll(metadata.partitionColumns());
+//            else
+//                columns.addAll(sstable.header.columns());
+//        }
+//        return new SerializationHeader(true, metadata, columns.build(), stats.get());
+//    }
+//
+//    private static Collection<SSTableReader> orderByDescendingGeneration(Collection<SSTableReader> sstables)
+//    {
+//        if (sstables.size() < 2)
+//            return sstables;
+//
+//        List<SSTableReader> readers = new ArrayList<>(sstables);
+//        readers.sort(SSTableReader.generationReverseComparator);
+//        return readers;
+//    }
 
     public SerializationHeader(boolean isForSSTable,
                                CFMetaData metadata,
@@ -296,7 +297,8 @@ public class SerializationHeader
      * We need the CFMetadata to properly deserialize a SerializationHeader but it's clunky to pass that to
      * a SSTable component, so we use this temporary object to delay the actual need for the metadata.
      */
-    public static class Component extends MetadataComponent
+    //public static class Component extends MetadataComponent
+    public static class Component
     {
         private final AbstractType<?> keyType;
         private final List<AbstractType<?>> clusteringTypes;
@@ -317,10 +319,10 @@ public class SerializationHeader
             this.stats = stats;
         }
 
-        public MetadataType getType()
-        {
-            return MetadataType.HEADER;
-        }
+       // public MetadataType getType()
+//        {
+//            return MetadataType.HEADER;
+//        }
 
         public SerializationHeader toHeader(CFMetaData metadata)
         {
@@ -412,7 +414,8 @@ public class SerializationHeader
         }
     }
 
-    public static class Serializer implements IMetadataComponentSerializer<Component>
+    //public static class Serializer implements IMetadataComponentSerializer<Component>
+    public static class Serializer
     {
         public void serializeForMessaging(SerializationHeader header, ColumnFilter selection, DataOutputPlus out, boolean hasStatic) throws IOException
         {
@@ -474,7 +477,7 @@ public class SerializationHeader
         }
 
         // For SSTables
-        public void serialize(Version version, Component header, DataOutputPlus out) throws IOException
+        public void serialize( Component header, DataOutputPlus out) throws IOException
         {
             EncodingStats.serializer.serialize(header.stats, out);
 
@@ -488,7 +491,7 @@ public class SerializationHeader
         }
 
         // For SSTables
-        public Component deserialize(Version version, DataInputPlus in) throws IOException
+        public Component deserialize( DataInputPlus in) throws IOException
         {
             EncodingStats stats = EncodingStats.serializer.deserialize(in);
 
@@ -508,7 +511,7 @@ public class SerializationHeader
         }
 
         // For SSTables
-        public int serializedSize(Version version, Component header)
+        public int serializedSize( Component header)
         {
             int size = EncodingStats.serializer.serializedSize(header.stats);
 

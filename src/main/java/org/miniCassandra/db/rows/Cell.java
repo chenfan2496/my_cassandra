@@ -23,13 +23,13 @@ import java.util.Comparator;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.miniCassandra.config.ColumnDefinition;
+import org.miniCassandra.db.DeletionPurger;
+import org.miniCassandra.db.SerializationHeader;
 import org.miniCassandra.db.io.util.DataInputPlus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.miniCassandra.db.*;
 import org.miniCassandra.db.io.util.DataOutputPlus;
 import org.miniCassandra.utils.memory.AbstractAllocator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A cell is our atomic unit for a single value of a single column.
@@ -56,7 +56,7 @@ public abstract class Cell extends ColumnData
         return pathComparator == null ? 0 : pathComparator.compare(c1.path(), c2.path());
     };
 
-    //public static final Serializer serializer = new BufferCell.Serializer();
+    public static final Serializer serializer = new BufferCell.Serializer();
 
     protected Cell(ColumnDefinition column)
     {

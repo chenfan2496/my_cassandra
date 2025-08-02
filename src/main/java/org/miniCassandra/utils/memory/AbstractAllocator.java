@@ -43,31 +43,31 @@ public abstract class AbstractAllocator
 
     public abstract ByteBuffer allocate(int size);
 
-    public Row.Builder cloningBTreeRowBuilder()
-    {
-        return new CloningBTreeRowBuilder(this);
-    }
+//    public Row.Builder cloningBTreeRowBuilder()
+//    {
+//        return new CloningBTreeRowBuilder(this);
+//    }
 
-    private static class CloningBTreeRowBuilder extends BTreeRow.Builder
-    {
-        private final AbstractAllocator allocator;
-
-        private CloningBTreeRowBuilder(AbstractAllocator allocator)
-        {
-            super(true);
-            this.allocator = allocator;
-        }
-
-        @Override
-        public void newRow(Clustering clustering)
-        {
-            super.newRow(clustering.copy(allocator));
-        }
-
-        @Override
-        public void addCell(Cell cell)
-        {
-            super.addCell(cell.copy(allocator));
-        }
-    }
+//    private static class CloningBTreeRowBuilder extends BTreeRow.Builder
+//    {
+//        private final AbstractAllocator allocator;
+//
+//        private CloningBTreeRowBuilder(AbstractAllocator allocator)
+//        {
+//            super(true);
+//            this.allocator = allocator;
+//        }
+//
+//        @Override
+//        public void newRow(Clustering clustering)
+//        {
+//            super.newRow(clustering.copy(allocator));
+//        }
+//
+//        @Override
+//        public void addCell(Cell cell)
+//        {
+//            super.addCell(cell.copy(allocator));
+//        }
+//    }
 }

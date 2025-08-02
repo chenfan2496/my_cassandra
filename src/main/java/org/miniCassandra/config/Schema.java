@@ -89,11 +89,11 @@ public class Schema
      *
      * @return metadata about ColumnFamily
      */
-    public CFMetaData getCFMetaData(UUID cfId)
-    {
-        Pair<String,String> cf = getCF(cfId);
-        return (cf == null) ? null : getCFMetaData(cf.left, cf.right);
-    }
+//    public CFMetaData getCFMetaData(UUID cfId)
+//    {
+//        Pair<String,String> cf = getCF(cfId);
+//        return (cf == null) ? null : getCFMetaData(cf.left, cf.right);
+//    }
 
     /**
      * longest permissible KS or CF name.  Our main concern is that filename not be more than 255 characters;
@@ -112,7 +112,7 @@ public class Schema
 //        ImmutableSet.of(TraceKeyspace.NAME, AuthKeyspace.NAME, SystemDistributedKeyspace.NAME);
 
 //    /* metadata map for faster keyspace lookup */
-   private final Map<String, KeyspaceMetadata> keyspaces = new NonBlockingHashMap<>();
+// private final Map<String, KeyspaceMetadata> keyspaces = new NonBlockingHashMap<>();
 //
 //    /* Keyspace objects, one per keyspace. Only one instance should ever exist for any given keyspace. */
 //    private final Map<String, Keyspace> keyspaceInstances = new NonBlockingHashMap<>();
@@ -316,15 +316,15 @@ public class Schema
 //     *
 //     * @return ColumnFamily Metadata object or null if it wasn't found
 //     */
-    public CFMetaData getCFMetaData(String keyspaceName, String cfName)
-    {
-        assert keyspaceName != null;
-
-        KeyspaceMetadata ksm = keyspaces.get(keyspaceName);
-        return ksm == null
-             ? null
-             : ksm.getTableOrViewNullable(cfName);
-    }
+//    public CFMetaData getCFMetaData(String keyspaceName, String cfName)
+//    {
+//        assert keyspaceName != null;
+//
+//        KeyspaceMetadata ksm = keyspaces.get(keyspaceName);
+//        return ksm == null
+//             ? null
+//             : ksm.getTableOrViewNullable(cfName);
+//    }
 
 //
 //    public CFMetaData getCFMetaData(Descriptor descriptor)
@@ -346,11 +346,11 @@ public class Schema
 //     *
 //     * @return The keyspace metadata or null if it wasn't found
 //     */
-    public KeyspaceMetadata getKSMetaData(String keyspaceName)
-    {
-        assert keyspaceName != null;
-        return keyspaces.get(keyspaceName);
-    }
+//    public KeyspaceMetadata getKSMetaData(String keyspaceName)
+//    {
+//        assert keyspaceName != null;
+//        return keyspaces.get(keyspaceName);
+//    }
 //
 //    private Set<String> getNonSystemKeyspacesSet()
 //    {

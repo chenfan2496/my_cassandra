@@ -19,7 +19,10 @@ package org.miniCassandra.db.rows;
 
 import org.miniCassandra.config.CFMetaData;
 import org.miniCassandra.config.ColumnDefinition;
+import org.miniCassandra.db.Columns;
+import org.miniCassandra.db.DeletionTime;
 import org.miniCassandra.db.SerializationHeader;
+import org.miniCassandra.db.filter.ColumnFilter;
 
 import java.nio.ByteBuffer;
 import java.util.*;
@@ -116,10 +119,10 @@ public class SerializationHelper
         return currentDroppedComplex != null && complexDeletion.markedForDeleteAt() <= currentDroppedComplex.droppedTime;
     }
 
-    public ByteBuffer maybeClearCounterValue(ByteBuffer value)
-    {
-        return flag == Flag.FROM_REMOTE || (flag == Flag.LOCAL && CounterContext.instance().shouldClearLocal(value))
-             ? CounterContext.instance().clearAllLocal(value)
-             : value;
-    }
+//    public ByteBuffer maybeClearCounterValue(ByteBuffer value)
+//    {
+//        return flag == Flag.FROM_REMOTE || (flag == Flag.LOCAL && CounterContext.instance().shouldClearLocal(value))
+//             ? CounterContext.instance().clearAllLocal(value)
+//             : value;
+//    }
 }

@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.miniCassandra.cql3.CQL3Type;
 import org.miniCassandra.db.TypeSizes;
 import org.miniCassandra.db.io.util.DataInputPlus;
 import org.miniCassandra.db.io.util.DataOutputPlus;
@@ -97,13 +98,13 @@ public abstract class AbstractType<T> implements Comparator<ByteBuffer>
         }
     }
 
-//    public static List<String> asCQLTypeStringList(List<AbstractType<?>> abstractTypes)
-//    {
-//        List<String> r = new ArrayList<>(abstractTypes.size());
-//        for (AbstractType<?> abstractType : abstractTypes)
-//            r.add(abstractType.asCQL3Type().toString());
-//        return r;
-//    }
+    public static List<String> asCQLTypeStringList(List<AbstractType<?>> abstractTypes)
+    {
+        List<String> r = new ArrayList<>(abstractTypes.size());
+        for (AbstractType<?> abstractType : abstractTypes)
+            r.add(abstractType.asCQL3Type().toString());
+        return r;
+    }
 
     public T compose(ByteBuffer bytes)
     {
@@ -190,11 +191,11 @@ public abstract class AbstractType<T> implements Comparator<ByteBuffer>
         validate(cellValue);
     }
 
-//    /* Most of our internal type should override that. */
-//    public CQL3Type asCQL3Type()
-//    {
-//        return new CQL3Type.Custom(this);
-//    }
+    /* Most of our internal type should override that. */
+    public CQL3Type asCQL3Type()
+    {
+        return new CQL3Type.Custom(this);
+    }
 
     /**
      * Same as compare except that this ignore ReversedType. This is to be use when
@@ -292,7 +293,7 @@ public abstract class AbstractType<T> implements Comparator<ByteBuffer>
     }
 
     /**
-     * Similar to {@link #isValueCompatibleWith(AbstractType)}, but takes into account {@link Cell} encoding.
+     * Similar to {@link #isValueCompatibleWith(AbstractType)}, but takes into account   encoding.
      * In particular, this method doesn't consider two types serialization compatible if one of them has fixed
      * length (overrides {@link #valueLengthIfFixed()}, and the other one doesn't.
      */

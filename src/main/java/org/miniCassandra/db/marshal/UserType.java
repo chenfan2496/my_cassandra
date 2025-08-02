@@ -24,6 +24,7 @@ import java.util.*;
 
 import com.google.common.base.Objects;
 //import org.miniCassandra.cql3.CQL3Type;
+import org.miniCassandra.cql3.CQL3Type;
 import org.miniCassandra.exceptions.ConfigurationException;
 import org.miniCassandra.exceptions.SyntaxException;
 import org.miniCassandra.serializers.MarshalException;
@@ -208,11 +209,11 @@ public class UserType extends TupleType
         return keyspace.equals(that.keyspace) && name.equals(that.name) && fieldNames.equals(that.fieldNames) && types.equals(that.types);
     }
 
-//    @Override
-//    public CQL3Type asCQL3Type()
-//    {
-//        return CQL3Type.UserDefined.create(this);
-//    }
+    @Override
+    public CQL3Type asCQL3Type()
+    {
+        return CQL3Type.UserDefined.create(this);
+    }
 
     @Override
     public boolean referencesUserType(String userTypeName)

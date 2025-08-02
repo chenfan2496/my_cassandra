@@ -66,7 +66,6 @@ public abstract class AbstractTextSerializer implements TypeSerializer<String>
      * Generates CQL literal for TEXT/VARCHAR/ASCII types.
      * Caveat: it does only generate literals with single quotes and not pg-style literals.
      */
-    @Override
     public String toCQLLiteral(ByteBuffer buffer)
     {
         return buffer == null

@@ -1558,20 +1558,20 @@ public final class CFMetaData
             UUIDSerializer.serializer.serialize(metadata.cfId, out, version);
         }
 
-        public CFMetaData deserialize(DataInputPlus in, int version) throws IOException
-        {
-            UUID cfId = UUIDSerializer.serializer.deserialize(in, version);
-            CFMetaData metadata = Schema.instance.getCFMetaData(cfId);
-            if (metadata == null)
-            {
-                String message = String.format("Couldn't find table for cfId %s. If a table was just " +
-                        "created, this is likely due to the schema not being fully propagated.  Please wait for schema " +
-                        "agreement on table creation.", cfId);
-                throw new UnknownColumnFamilyException(message, cfId);
-            }
-
-            return metadata;
-        }
+//        public CFMetaData deserialize(DataInputPlus in, int version) throws IOException
+//        {
+//            UUID cfId = UUIDSerializer.serializer.deserialize(in, version);
+//           // CFMetaData metadata = Schema.instance.getCFMetaData(cfId);
+//            if (metadata == null)
+//            {
+//                String message = String.format("Couldn't find table for cfId %s. If a table was just " +
+//                        "created, this is likely due to the schema not being fully propagated.  Please wait for schema " +
+//                        "agreement on table creation.", cfId);
+//                throw new UnknownColumnFamilyException(message, cfId);
+//            }
+//
+//            return metadata;
+//        }
 
         public long serializedSize(CFMetaData metadata, int version)
         {

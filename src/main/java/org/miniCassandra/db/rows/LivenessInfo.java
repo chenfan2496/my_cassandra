@@ -18,6 +18,7 @@
 package org.miniCassandra.db.rows;
 
 import org.miniCassandra.config.CFMetaData;
+import org.miniCassandra.db.ExpirationDateOverflowHandling;
 import org.miniCassandra.db.TypeSizes;
 import org.miniCassandra.serializers.MarshalException;
 import org.miniCassandra.utils.FBUtilities;
@@ -46,7 +47,6 @@ public class LivenessInfo
      * Used as flag for representing an expired liveness.
      *
      * TTL per request is at most 20 yrs, so this shouldn't conflict
-     * (See {@link org.apache.cassandra.cql3.Attributes#MAX_TTL})
      */
     public static final int EXPIRED_LIVENESS_TTL = Integer.MAX_VALUE;
     public static final int NO_EXPIRATION_TIME = Cell.NO_DELETION_TIME;
@@ -191,7 +191,7 @@ public class LivenessInfo
      *
      * If timestamps are the same and none of them are expired livenessInfo,
      * livenessInfo with greater TTL supersedes another. It also means, if timestamps are the same,
-     * ttl superseders no-ttl. This is the same rule as {@link Conflicts#resolveRegular}
+     * ttl superseders no-ttl. This is the same rule as
      *
      * If timestamps are the same and one of them is expired livenessInfo. Expired livenessInfo
      * supersedes, ie. tombstone supersedes.
@@ -266,7 +266,6 @@ public class LivenessInfo
      * Effectively acts as a PK tombstone. This is used for Materialized Views to shadow
      * updated entries while co-existing with row tombstones.
      *
-     * See {@link org.apache.cassandra.db.view.ViewUpdateGenerator#deleteOldEntryInternal}.
      */
     private static class ExpiredLivenessInfo extends ExpiringLivenessInfo
     {

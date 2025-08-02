@@ -23,6 +23,8 @@ package org.miniCassandra.utils;
 
 import java.nio.ByteBuffer;
 
+import java.util.ArrayList;
+
 import org.github.jamm.MemoryLayoutSpecification;
 import org.github.jamm.MemoryMeter;
 
@@ -31,14 +33,10 @@ import org.github.jamm.MemoryMeter;
  */
 public class ObjectSizes
 {
-    private static final MemoryMeter meter = MemoryMeter.builder()
-            .withGuessing(MemoryMeter.Guess.UNSAFE)
-            .ignoreOuterClassReference()
-            .measureNonStrongReferences()
-            .build();
-                                             //.omitSharedBufferOverhead()
-                                             //.withGuessing(MemoryMeter.Guess.UNSAFE)
-                                             //.ignoreKnownSingletons();
+    private static final MemoryMeter meter = new MemoryMeter()
+                                             .omitSharedBufferOverhead()
+                                             .withGuessing(MemoryMeter.Guess.FALLBACK_UNSAFE)
+                                             .ignoreKnownSingletons();
 
     private static final long BUFFER_EMPTY_SIZE = measure(ByteBufferUtil.EMPTY_BYTE_BUFFER);
     private static final long STRING_EMPTY_SIZE = measure("");
@@ -80,7 +78,7 @@ public class ObjectSizes
      */
     public static long sizeOfReferenceArray(int length)
     {
-        return sizeOfArray(length, MemoryLayoutSpecification.getEffectiveMemoryLayoutSpecification().getReferenceSize());
+        return sizeOfArray(length, MemoryLayoutSpecification.SPEC.getReferenceSize());
     }
 
     /**
@@ -92,16 +90,10 @@ public class ObjectSizes
     {
         return sizeOfReferenceArray(objects.length);
     }
-    public static long sizeOfArray(Object[] objects)
-    {
-        return meter.measureArray(objects);
-    }
-
 
     private static long sizeOfArray(int length, long elementSize)
     {
-        meter.measureArray()
-        //return MemoryLayoutSpecification.getEffectiveMemoryLayoutSpecification().getReferenceSize(length, elementSize);
+        return MemoryLayoutSpecification.sizeOfArray(length, elementSize);
     }
 
     /**

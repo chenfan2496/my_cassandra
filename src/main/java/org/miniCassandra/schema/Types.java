@@ -26,6 +26,7 @@ import com.google.common.collect.MapDifference;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
+import org.miniCassandra.cql3.CQL3Type;
 import org.miniCassandra.db.marshal.AbstractType;
 import org.miniCassandra.db.marshal.UserType;
 import org.miniCassandra.exceptions.ConfigurationException;
@@ -263,24 +264,24 @@ public final class Types implements Iterable<UserType>
         {
             final String name;
             final List<String> fieldNames;
-            //final List<CQL3Type.Raw> fieldTypes;
-            RawUDT(String name, List<String> fieldNames)
-            {
-                this.name = name;
-                this.fieldNames = fieldNames;
-                //this.fieldTypes = fieldTypes;
-            }
-//            RawUDT(String name, List<String> fieldNames, List<CQL3Type.Raw> fieldTypes)
+            final List<CQL3Type.Raw> fieldTypes;
+//            RawUDT(String name, List<String> fieldNames,List<CQL3Type.Raw> fieldTypes)
 //            {
 //                this.name = name;
 //                this.fieldNames = fieldNames;
 //                this.fieldTypes = fieldTypes;
 //            }
+            RawUDT(String name, List<String> fieldNames, List<CQL3Type.Raw> fieldTypes)
+            {
+                this.name = name;
+                this.fieldNames = fieldNames;
+                this.fieldTypes = fieldTypes;
+            }
 
-//            boolean referencesUserType(RawUDT other)
-//            {
-//                return fieldTypes.stream().anyMatch(t -> t.referencesUserType(other.name));
-//            }
+            boolean referencesUserType(RawUDT other)
+            {
+                return fieldTypes.stream().anyMatch(t -> t.referencesUserType(other.name));
+            }
 
             UserType prepare(String keyspace, Types types)
             {

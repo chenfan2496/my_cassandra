@@ -15,23 +15,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.miniCassandra.db;
+package org.miniCassandra.utils;
 
-import org.miniCassandra.db.rows.LivenessInfo;
 
-public interface DeletionPurger
+import org.miniCassandra.utils.concurrent.SharedCloseable;
+
+public interface IFilter extends SharedCloseable
 {
-    public static final DeletionPurger PURGE_ALL = (ts, ldt) -> true;
-
-    public boolean shouldPurge(long timestamp, int localDeletionTime);
-
-    public default boolean shouldPurge(DeletionTime dt)
+    interface FilterKey
     {
-        return !dt.isLive() && shouldPurge(dt.markedForDeleteAt(), dt.localDeletionTime());
+        /** Places the murmur3 hash of the key in the given long array of size at least two. */
+        void filterHash(long[] dest);
     }
 
-    public default boolean shouldPurge(LivenessInfo liveness, int nowInSec)
-    {
-        return !liveness.isLive(nowInSec) && shouldPurge(liveness.timestamp(), liveness.localExpirationTime());
-    }
+    void add(FilterKey key);
+
+    boolean isPresent(FilterKey key);
+
+    void clear();
+
+    long serializedSize();
+
+    void close();
+
+    IFilter sharedCopy();
+
+    /**
+     * Returns the amount of memory in bytes used off heap.
+     * @return the amount of memory in bytes used off heap
+     */
+    long offHeapSize();
 }

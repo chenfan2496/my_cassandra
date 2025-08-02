@@ -17,11 +17,10 @@
  */
 package org.miniCassandra.exceptions;
 
+import org.miniCassandra.transport.ProtocolException;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.cassandra.transport.ProtocolException;
-
 /**
  * Exceptions code, as defined by the binary protocol.
  */

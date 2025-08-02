@@ -17,7 +17,6 @@
  */
 package org.miniCassandra.db.rows;
 
-import org.miniCassandra.config.CFMetaData;
 import org.miniCassandra.config.ColumnDefinition;
 import org.miniCassandra.db.DeletionPurger;
 import org.miniCassandra.db.SerializationHeader;
@@ -31,7 +30,7 @@ import org.miniCassandra.utils.memory.AbstractAllocator;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
-
+import org.miniCassandra.db.marshal.ByteType;
 
 public class BufferCell extends AbstractCell
 {

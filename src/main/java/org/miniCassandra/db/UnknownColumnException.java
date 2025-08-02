@@ -17,11 +17,12 @@
  */
 package org.miniCassandra.db;
 
+import org.miniCassandra.config.CFMetaData;
+import org.miniCassandra.db.marshal.UTF8Type;
+import org.miniCassandra.utils.ByteBufferUtil;
+
 import java.nio.ByteBuffer;
 
-import org.apache.cassandra.config.CFMetaData;
-import org.apache.cassandra.db.marshal.UTF8Type;
-import org.apache.cassandra.utils.ByteBufferUtil;
 
 /**
  * Exception thrown when we read a column internally that is unknown. Note that

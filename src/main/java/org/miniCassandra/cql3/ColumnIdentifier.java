@@ -20,6 +20,7 @@ package org.miniCassandra.cql3;
 import java.nio.ByteBuffer;
 import java.util.Locale;
 import java.util.concurrent.ConcurrentMap;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.common.collect.MapMaker;
@@ -196,10 +197,10 @@ public class ColumnIdentifier implements IMeasurableMemory, Comparable<ColumnIde
      * Returns a string representation of the identifier that is safe to use directly in CQL queries.
      * In necessary, the string will be double-quoted, and any quotes inside the string will be escaped.
      */
-    //public String toCQLString()
-//    {
-//        return maybeQuote(text);
-//    }
+    public String toCQLString()
+    {
+        return maybeQuote(text);
+    }
 
     public long unsharedHeapSize()
     {
@@ -367,11 +368,11 @@ public class ColumnIdentifier implements IMeasurableMemory, Comparable<ColumnIde
 //        }
 //    }
 //
-//    public static String maybeQuote(String text)
-//    {
-//        if (UNQUOTED_IDENTIFIER.matcher(text).matches() && !ReservedKeywords.isReserved(text))
-//            return text;
-//
-//        return '"' + PATTERN_DOUBLE_QUOTE.matcher(text).replaceAll(Matcher.quoteReplacement("\"\"")) + '"';
-//    }
+    public static String maybeQuote(String text)
+    {
+        if (UNQUOTED_IDENTIFIER.matcher(text).matches() && !ReservedKeywords.isReserved(text))
+            return text;
+
+        return '"' + PATTERN_DOUBLE_QUOTE.matcher(text).replaceAll(Matcher.quoteReplacement("\"\"")) + '"';
+    }
 }

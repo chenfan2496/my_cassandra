@@ -19,11 +19,11 @@
 //
 //import com.google.common.collect.ImmutableSet;
 //
-//import org.apache.cassandra.cql3.*;
-//import org.apache.cassandra.db.marshal.AbstractType;
-//import org.apache.cassandra.db.marshal.UserType;
+//import org.miniCassandra.cql3.*;
+//import org.miniCassandra.db.marshal.AbstractType;
+//import org.miniCassandra.db.marshal.UserType;
 //
-//import static org.apache.cassandra.utils.ByteBufferUtil.bytes;
+//import static org.miniCassandra.utils.ByteBufferUtil.bytes;
 //
 //public final class CQLTypeParser
 //{

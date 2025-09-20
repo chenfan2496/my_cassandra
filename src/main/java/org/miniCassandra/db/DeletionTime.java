@@ -26,6 +26,7 @@ import org.miniCassandra.db.io.ISerializer;
 import org.miniCassandra.db.io.util.DataInputPlus;
 import org.miniCassandra.db.io.util.DataOutputPlus;
 import org.miniCassandra.db.rows.Cell;
+import org.miniCassandra.db.rows.LivenessInfo;
 import org.miniCassandra.utils.FBUtilities;
 import org.miniCassandra.utils.ObjectSizes;
 
@@ -128,10 +129,10 @@ public class DeletionTime implements Comparable<DeletionTime>, IMeasurableMemory
         return markedForDeleteAt() > dt.markedForDeleteAt() || (markedForDeleteAt() == dt.markedForDeleteAt() && localDeletionTime() > dt.localDeletionTime());
     }
 
-    //public boolean deletes(LivenessInfo info)
-//    {
-//        return deletes(info.timestamp());
-//    }
+    public boolean deletes(LivenessInfo info)
+    {
+        return deletes(info.timestamp());
+    }
 
     public boolean deletes(Cell cell)
     {

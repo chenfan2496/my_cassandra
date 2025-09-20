@@ -36,6 +36,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.miniCassandra.cql3.ColumnIdentifier;
+import org.miniCassandra.db.ClusteringComparator;
 import org.miniCassandra.db.DecoratedKey;
 import org.miniCassandra.db.PartitionColumns;
 import org.miniCassandra.db.UnknownColumnFamilyException;
@@ -83,7 +84,7 @@ public final class CFMetaData
     private final boolean isView;
     private final boolean isIndex;
 
-    //public volatile ClusteringComparator comparator;  // bytes, long, timeuuid, utf8, etc. This is built directly from clusteringColumns
+    public volatile ClusteringComparator comparator;  // bytes, long, timeuuid, utf8, etc. This is built directly from clusteringColumns
     public final IPartitioner partitioner;            // partitioner the table uses
     private volatile AbstractType<?> keyValidator;
 
@@ -501,7 +502,7 @@ public final class CFMetaData
 //        return triggers;
 //    }
 
-    // Compiles a system metadata
+     //Compiles a system metadata
 //    public static CFMetaData compile(String cql, String keyspace)
 //    {
 //        CFStatement parsed = (CFStatement)QueryProcessor.parseStatement(cql);
@@ -981,7 +982,7 @@ public final class CFMetaData
 
 //    public static Class<? extends AbstractCompactionStrategy> createCompactionStrategy(String className) throws ConfigurationException
 //    {
-//        className = className.contains(".") ? className : "org.apache.cassandra.db.compaction." + className;
+//        className = className.contains(".") ? className : "org.miniCassandra.db.compaction." + className;
 //        Class<AbstractCompactionStrategy> strategyClass = FBUtilities.classForName(className, "compaction strategy");
 //        if (!AbstractCompactionStrategy.class.isAssignableFrom(strategyClass))
 //            throw new ConfigurationException(String.format("Specified compaction strategy class (%s) is not derived from AbstractReplicationStrategy", className));
@@ -1558,20 +1559,20 @@ public final class CFMetaData
             UUIDSerializer.serializer.serialize(metadata.cfId, out, version);
         }
 
-//        public CFMetaData deserialize(DataInputPlus in, int version) throws IOException
-//        {
-//            UUID cfId = UUIDSerializer.serializer.deserialize(in, version);
-//           // CFMetaData metadata = Schema.instance.getCFMetaData(cfId);
-//            if (metadata == null)
-//            {
-//                String message = String.format("Couldn't find table for cfId %s. If a table was just " +
-//                        "created, this is likely due to the schema not being fully propagated.  Please wait for schema " +
-//                        "agreement on table creation.", cfId);
-//                throw new UnknownColumnFamilyException(message, cfId);
-//            }
-//
-//            return metadata;
-//        }
+        public CFMetaData deserialize(DataInputPlus in, int version) throws IOException
+        {
+            UUID cfId = UUIDSerializer.serializer.deserialize(in, version);
+            CFMetaData metadata = Schema.instance.getCFMetaData(cfId);
+            if (metadata == null)
+            {
+                String message = String.format("Couldn't find table for cfId %s. If a table was just " +
+                        "created, this is likely due to the schema not being fully propagated.  Please wait for schema " +
+                        "agreement on table creation.", cfId);
+                throw new UnknownColumnFamilyException(message, cfId);
+            }
+
+            return metadata;
+        }
 
         public long serializedSize(CFMetaData metadata, int version)
         {

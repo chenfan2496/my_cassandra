@@ -21,6 +21,17 @@
             <artifactId>joda-time</artifactId>
             <version>2.10.10</version>
         </dependency>
+        <!-- Cassandra 3.0 对 metrics-core 的核心依赖 (在 Cassandra 的 pom.xml 内) -->
+        <dependency>
+            <groupId>com.codahale.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.1.108.Final</version>
+        </dependency>
         <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
@@ -37,10 +48,15 @@
             <version>0.3.0</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.cliffic/high_scale_lib -->
+<!--        <dependency>-->
+<!--            <groupId>org.cliffic</groupId>-->
+<!--            <artifactId>high_scale_lib</artifactId>-->
+<!--            <version>1.1.2</version>-->
+<!--        </dependency>-->
         <dependency>
-            <groupId>org.cliffic</groupId>
-            <artifactId>high_scale_lib</artifactId>
-            <version>1.1.2</version>
+            <groupId>org.jctools</groupId>
+            <artifactId>jctools-core</artifactId>
+            <version>4.0.2</version> <!-- 2023年发布 -->
         </dependency>
         <dependency>
             <groupId>org.yaml</groupId>
@@ -71,7 +87,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>17.0</version>
+            <version>16.0.1</version>
         </dependency>
         <dependency>
             <groupId>net.nicoulaj.compile-command-annotations</groupId>

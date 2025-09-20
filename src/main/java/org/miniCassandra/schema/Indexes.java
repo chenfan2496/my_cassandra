@@ -22,7 +22,7 @@
 //
 //import com.google.common.collect.ImmutableMap;
 //
-//import org.apache.cassandra.config.Schema;
+//import org.miniCassandra.config.Schema;
 //
 //import static com.google.common.collect.Iterables.filter;
 //

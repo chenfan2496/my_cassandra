@@ -25,6 +25,8 @@
 //import com.google.common.base.MoreObjects;
 //import com.google.common.collect.ImmutableMap;
 //import org.apache.commons.lang3.StringUtils;
+//import org.miniCassandra.exceptions.ConfigurationException;
+//import org.miniCassandra.utils.FBUtilities;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 //
@@ -229,7 +231,7 @@
 //    {
 //        String className = name.contains(".")
 //                         ? name
-//                         : "org.apache.cassandra.db.compaction." + name;
+//                         : "org.miniCassandra.db.compaction." + name;
 //        Class<AbstractCompactionStrategy> strategyClass = FBUtilities.classForName(className, "compaction strategy");
 //
 //        if (!AbstractCompactionStrategy.class.isAssignableFrom(strategyClass))

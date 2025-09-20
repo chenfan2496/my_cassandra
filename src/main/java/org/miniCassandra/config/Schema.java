@@ -23,9 +23,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 //import org.miniCassandra.schema.KeyspaceMetadata;
 //import org.miniCassandra.schema.KeyspaceParams;
+import org.jctools.maps.NonBlockingHashMap;
+import org.miniCassandra.db.SystemKeyspace;
 import org.miniCassandra.schema.KeyspaceMetadata;
 import org.miniCassandra.utils.ConcurrentBiMap;
 import org.miniCassandra.utils.Pair;
@@ -89,11 +92,11 @@ public class Schema
      *
      * @return metadata about ColumnFamily
      */
-//    public CFMetaData getCFMetaData(UUID cfId)
-//    {
-//        Pair<String,String> cf = getCF(cfId);
-//        return (cf == null) ? null : getCFMetaData(cf.left, cf.right);
-//    }
+    public CFMetaData getCFMetaData(UUID cfId)
+    {
+        Pair<String,String> cf = getCF(cfId);
+        return (cf == null) ? null : getCFMetaData(cf.left, cf.right);
+    }
 
     /**
      * longest permissible KS or CF name.  Our main concern is that filename not be more than 255 characters;
@@ -103,7 +106,7 @@ public class Schema
      */
     public static final int NAME_LENGTH = 48;
 
-//    /* system keyspace names (the ones with LocalStrategy replication strategy) */
+    /* system keyspace names (the ones with LocalStrategy replication strategy) */
 //    public static final Set<String> LOCAL_SYSTEM_KEYSPACE_NAMES =
 //        ImmutableSet.of(SystemKeyspace.NAME, SchemaKeyspace.NAME);
 //
@@ -112,7 +115,7 @@ public class Schema
 //        ImmutableSet.of(TraceKeyspace.NAME, AuthKeyspace.NAME, SystemDistributedKeyspace.NAME);
 
 //    /* metadata map for faster keyspace lookup */
-// private final Map<String, KeyspaceMetadata> keyspaces = new NonBlockingHashMap<>();
+    private final Map<String, KeyspaceMetadata> keyspaces = new NonBlockingHashMap<>();
 //
 //    /* Keyspace objects, one per keyspace. Only one instance should ever exist for any given keyspace. */
 //    private final Map<String, Keyspace> keyspaceInstances = new NonBlockingHashMap<>();
@@ -120,9 +123,9 @@ public class Schema
     /* metadata map for faster ColumnFamily lookup */
     private final ConcurrentBiMap<Pair<String, String>, UUID> cfIdMap = new ConcurrentBiMap<>();
 
-    /**
-     * Initialize empty schema object and load the hardcoded system tables
-     */
+//    /**
+//     * Initialize empty schema object and load the hardcoded system tables
+//     */
 //    public Schema()
 //    {
 //        if (!Config.isClientMode())
@@ -316,15 +319,16 @@ public class Schema
 //     *
 //     * @return ColumnFamily Metadata object or null if it wasn't found
 //     */
-//    public CFMetaData getCFMetaData(String keyspaceName, String cfName)
-//    {
-//        assert keyspaceName != null;
-//
-//        KeyspaceMetadata ksm = keyspaces.get(keyspaceName);
+    public CFMetaData getCFMetaData(String keyspaceName, String cfName)
+    {
+        assert keyspaceName != null;
+
+        KeyspaceMetadata ksm = keyspaces.get(keyspaceName);
+        return null;
 //        return ksm == null
 //             ? null
 //             : ksm.getTableOrViewNullable(cfName);
-//    }
+    }
 
 //
 //    public CFMetaData getCFMetaData(Descriptor descriptor)

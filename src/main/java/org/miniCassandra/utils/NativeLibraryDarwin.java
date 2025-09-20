@@ -39,7 +39,7 @@ import com.sun.jna.Pointer;
  * native calls that are supported on that target operating system will be
  * unavailable simply because of one native defined method not supported
  * on the runtime operating system.
- * @see org.apache.cassandra.utils.NativeLibraryWrapper
+ * @see org.miniCassandra.utils.NativeLibraryWrapper
  * @see NativeLibrary
  */
 public class NativeLibraryDarwin implements NativeLibraryWrapper

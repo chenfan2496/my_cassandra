@@ -29,35 +29,16 @@
 //import com.google.common.collect.*;
 //import com.google.common.collect.Maps;
 //import com.google.common.collect.Tables;
+//import org.miniCassandra.config.CFMetaData;
+//import org.miniCassandra.config.Schema;
+//import org.miniCassandra.utils.FBUtilities;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 //
-//import org.apache.cassandra.config.*;
-//import org.apache.cassandra.config.CFMetaData.DroppedColumn;
-//import org.apache.cassandra.config.ColumnDefinition.ClusteringOrder;
-//import org.apache.cassandra.cql3.*;
-//import org.apache.cassandra.cql3.functions.*;
-//import org.apache.cassandra.cql3.statements.SelectStatement;
-//import org.apache.cassandra.db.*;
-//import org.apache.cassandra.db.marshal.*;
-//import org.apache.cassandra.db.partitions.*;
-//import org.apache.cassandra.db.rows.*;
-//import org.apache.cassandra.db.view.View;
-//import org.apache.cassandra.exceptions.ConfigurationException;
-//import org.apache.cassandra.exceptions.InvalidRequestException;
-//import org.apache.cassandra.locator.LocalStrategy;
-//import org.apache.cassandra.service.PendingRangeCalculatorService;
-//import org.apache.cassandra.transport.Server;
-//import org.apache.cassandra.utils.ByteBufferUtil;
-//import org.apache.cassandra.utils.FBUtilities;
-//import org.apache.cassandra.utils.Pair;
 //
 //import static java.lang.String.format;
 //
 //import static java.util.stream.Collectors.toList;
-//import static org.apache.cassandra.cql3.QueryProcessor.executeInternal;
-//import static org.apache.cassandra.cql3.QueryProcessor.executeOnceInternal;
-//import static org.apache.cassandra.schema.CQLTypeParser.parse;
 //
 ///**
 // * system_schema.* tables and methods for manipulating them.
@@ -268,7 +249,7 @@
 //
 //    public static KeyspaceMetadata metadata()
 //    {
-//        return KeyspaceMetadata.create(NAME, KeyspaceParams.local(), org.apache.cassandra.schema.Tables.of(ALL_TABLE_METADATA));
+//        return KeyspaceMetadata.create(NAME, KeyspaceParams.local(), org.miniCassandra.schema.Tables.of(ALL_TABLE_METADATA));
 //    }
 //
 //    /**
@@ -893,7 +874,7 @@
 //    {
 //        String query = format("SELECT keyspace_name FROM %s.%s", NAME, KEYSPACES);
 //
-//        Keyspaces.Builder keyspaces = org.apache.cassandra.schema.Keyspaces.builder();
+//        Keyspaces.Builder keyspaces = org.miniCassandra.schema.Keyspaces.builder();
 //        for (UntypedResultSet.Row row : query(query))
 //        {
 //            String keyspaceName = row.getString("keyspace_name");
@@ -911,7 +892,7 @@
 //         */
 //        String query = format("SELECT keyspace_name FROM %s.%s WHERE keyspace_name IN ?", NAME, KEYSPACES);
 //
-//        Keyspaces.Builder keyspaces = org.apache.cassandra.schema.Keyspaces.builder();
+//        Keyspaces.Builder keyspaces = org.miniCassandra.schema.Keyspaces.builder();
 //        for (UntypedResultSet.Row row : query(query, new ArrayList<>(includedKeyspaceNames)))
 //            keyspaces.add(fetchKeyspace(row.getString("keyspace_name")));
 //        return keyspaces.build();
@@ -941,7 +922,7 @@
 //    {
 //        String query = format("SELECT * FROM %s.%s WHERE keyspace_name = ?", NAME, TYPES);
 //
-//        Types.RawBuilder types = org.apache.cassandra.schema.Types.rawBuilder(keyspaceName);
+//        Types.RawBuilder types = org.miniCassandra.schema.Types.rawBuilder(keyspaceName);
 //        for (UntypedResultSet.Row row : query(query, keyspaceName))
 //        {
 //            String name = row.getString("type_name");
@@ -956,7 +937,7 @@
 //    {
 //        String query = format("SELECT table_name FROM %s.%s WHERE keyspace_name = ?", NAME, TABLES);
 //
-//        Tables.Builder tables = org.apache.cassandra.schema.Tables.builder();
+//        Tables.Builder tables = org.miniCassandra.schema.Tables.builder();
 //        for (UntypedResultSet.Row row : query(query, keyspaceName))
 //        {
 //            String tableName = row.getString("table_name");
@@ -1110,7 +1091,7 @@
 //         * them anymore), so before storing dropped columns in schema we expand UDTs to tuples. See expandUserTypes method.
 //         * Because of that, we can safely pass Types.none() to parse()
 //         */
-//        AbstractType<?> type = parse(keyspace, row.getString("type"), org.apache.cassandra.schema.Types.none());
+//        AbstractType<?> type = parse(keyspace, row.getString("type"), org.miniCassandra.schema.Types.none());
 //        long droppedTime = TimeUnit.MILLISECONDS.toMicros(row.getLong("dropped_time"));
 //        return new CFMetaData.DroppedColumn(name, kind, type, droppedTime);
 //    }
@@ -1118,7 +1099,7 @@
 //    private static Indexes fetchIndexes(String keyspace, String table)
 //    {
 //        String query = String.format("SELECT * FROM %s.%s WHERE keyspace_name = ? AND table_name = ?", NAME, INDEXES);
-//        Indexes.Builder indexes = org.apache.cassandra.schema.Indexes.builder();
+//        Indexes.Builder indexes = org.miniCassandra.schema.Indexes.builder();
 //        query(query, keyspace, table).forEach(row -> indexes.add(createIndexMetadataFromRow(row)));
 //        return indexes.build();
 //    }
@@ -1134,7 +1115,7 @@
 //    private static Triggers fetchTriggers(String keyspace, String table)
 //    {
 //        String query = String.format("SELECT * FROM %s.%s WHERE keyspace_name = ? AND table_name = ?", NAME, TRIGGERS);
-//        Triggers.Builder triggers = org.apache.cassandra.schema.Triggers.builder();
+//        Triggers.Builder triggers = org.miniCassandra.schema.Triggers.builder();
 //        query(query, keyspace, table).forEach(row -> triggers.add(createTriggerFromRow(row)));
 //        return triggers.build();
 //    }
@@ -1150,7 +1131,7 @@
 //    {
 //        String query = format("SELECT view_name FROM %s.%s WHERE keyspace_name = ?", NAME, VIEWS);
 //
-//        Views.Builder views = org.apache.cassandra.schema.Views.builder();
+//        Views.Builder views = org.miniCassandra.schema.Views.builder();
 //        for (UntypedResultSet.Row row : query(query, keyspaceName))
 //            views.add(fetchView(keyspaceName, row.getString("view_name"), types));
 //        return views.build();
@@ -1198,7 +1179,7 @@
 //        Functions udfs = fetchUDFs(keyspaceName, types);
 //        Functions udas = fetchUDAs(keyspaceName, udfs, types);
 //
-//        return org.apache.cassandra.schema.Functions.builder()
+//        return org.miniCassandra.schema.Functions.builder()
 //                                                    .add(udfs)
 //                                                    .add(udas)
 //                                                    .build();
@@ -1208,7 +1189,7 @@
 //    {
 //        String query = format("SELECT * FROM %s.%s WHERE keyspace_name = ?", NAME, FUNCTIONS);
 //
-//        Functions.Builder functions = org.apache.cassandra.schema.Functions.builder();
+//        Functions.Builder functions = org.miniCassandra.schema.Functions.builder();
 //        for (UntypedResultSet.Row row : query(query, keyspaceName))
 //            functions.add(createUDFFromRow(row, types));
 //        return functions.build();
@@ -1234,7 +1215,7 @@
 //        String body = row.getString("body");
 //        boolean calledOnNullInput = row.getBoolean("called_on_null_input");
 //
-//        org.apache.cassandra.cql3.functions.Function existing = Schema.instance.findFunction(name, argTypes).orElse(null);
+//        org.miniCassandra.cql3.functions.Function existing = Schema.instance.findFunction(name, argTypes).orElse(null);
 //        if (existing instanceof UDFunction)
 //        {
 //            // This check prevents duplicate compilation of effectively the same UDF.
@@ -1269,7 +1250,7 @@
 //    {
 //        String query = format("SELECT * FROM %s.%s WHERE keyspace_name = ?", NAME, AGGREGATES);
 //
-//        Functions.Builder aggregates = org.apache.cassandra.schema.Functions.builder();
+//        Functions.Builder aggregates = org.miniCassandra.schema.Functions.builder();
 //        for (UntypedResultSet.Row row : query(query, keyspaceName))
 //            aggregates.add(createUDAFromRow(row, udfs, types));
 //        return aggregates.build();

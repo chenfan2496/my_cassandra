@@ -32,7 +32,7 @@ import com.sun.jna.Pointer;
  * <p> This implementation only offer support for the {@code callGetpid} method
  * using the Windows/Kernel32 library.</p>
  *
- * @see org.apache.cassandra.utils.NativeLibraryWrapper
+ * @see org.miniCassandra.utils.NativeLibraryWrapper
  * @see NativeLibrary
  */
 public class NativeLibraryWindows implements NativeLibraryWrapper

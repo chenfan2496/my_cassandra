@@ -124,7 +124,7 @@ public class BufferedDataOutputStreamPlus extends DataOutputStreamPlus
      * Makes a defensive copy of the incoming ByteBuffer and don't modify the position or limit
      * even temporarily so it is thread-safe WRT to the incoming buffer
      * (non-Javadoc)
-     * @see org.apache.cassandra.io.util.DataOutputPlus#write(java.nio.ByteBuffer)
+     * @see org.miniCassandra.io.util.DataOutputPlus#write(java.nio.ByteBuffer)
      */
     @Override
     public void write(ByteBuffer toWrite) throws IOException

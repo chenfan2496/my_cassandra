@@ -86,7 +86,7 @@ public class ExpirationDateOverflowHandling
 //                    /**
 //                     * Capping at this stage is basically not rejecting the request. The actual capping is done
 //                     * by {@link #computeLocalExpirationTime(int, int)}, which converts the negative TTL
-//                     * to {@link org.apache.cassandra.db.BufferExpiringCell#MAX_DELETION_TIME}
+//                     * to {@link org.miniCassandra.db.BufferExpiringCell#MAX_DELETION_TIME}
 //                     */
 //                    NoSpamLogger.log(logger, NoSpamLogger.Level.WARN, EXPIRATION_OVERFLOW_WARNING_INTERVAL_MINUTES, TimeUnit.MINUTES, MAXIMUM_EXPIRATION_DATE_EXCEEDED_WARNING,
 //                                     metadata.ksName, metadata.cfName, isDefaultTTL? "default " : "", ttl);

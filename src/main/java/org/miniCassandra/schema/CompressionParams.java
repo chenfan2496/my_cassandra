@@ -189,7 +189,7 @@
 //        if (className == null || className.isEmpty())
 //            return null;
 //
-//        className = className.contains(".") ? className : "org.apache.cassandra.io.compress." + className;
+//        className = className.contains(".") ? className : "org.miniCassandra.io.compress." + className;
 //        try
 //        {
 //            return Class.forName(className);

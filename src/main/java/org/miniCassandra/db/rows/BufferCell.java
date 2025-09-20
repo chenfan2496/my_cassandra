@@ -17,6 +17,7 @@
  */
 package org.miniCassandra.db.rows;
 
+import org.miniCassandra.config.CFMetaData;
 import org.miniCassandra.config.ColumnDefinition;
 import org.miniCassandra.db.DeletionPurger;
 import org.miniCassandra.db.SerializationHeader;

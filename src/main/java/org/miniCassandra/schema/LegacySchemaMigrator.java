@@ -27,27 +27,27 @@
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 //
-//import org.apache.cassandra.config.*;
-//import org.apache.cassandra.cql3.ColumnIdentifier;
-//import org.apache.cassandra.cql3.QueryProcessor;
-//import org.apache.cassandra.cql3.SuperColumnCompatibility;
-//import org.apache.cassandra.cql3.UntypedResultSet;
-//import org.apache.cassandra.cql3.functions.FunctionName;
-//import org.apache.cassandra.cql3.functions.UDAggregate;
-//import org.apache.cassandra.cql3.functions.UDFunction;
-//import org.apache.cassandra.db.*;
-//import org.apache.cassandra.db.compaction.AbstractCompactionStrategy;
-//import org.apache.cassandra.db.marshal.*;
-//import org.apache.cassandra.db.rows.RowIterator;
-//import org.apache.cassandra.db.rows.UnfilteredRowIterators;
-//import org.apache.cassandra.exceptions.InvalidRequestException;
-//import org.apache.cassandra.utils.ByteBufferUtil;
-//import org.apache.cassandra.utils.FBUtilities;
-//import org.apache.cassandra.utils.concurrent.OpOrder;
+//import org.miniCassandra.config.*;
+//import org.miniCassandra.cql3.ColumnIdentifier;
+//import org.miniCassandra.cql3.QueryProcessor;
+//import org.miniCassandra.cql3.SuperColumnCompatibility;
+//import org.miniCassandra.cql3.UntypedResultSet;
+//import org.miniCassandra.cql3.functions.FunctionName;
+//import org.miniCassandra.cql3.functions.UDAggregate;
+//import org.miniCassandra.cql3.functions.UDFunction;
+//import org.miniCassandra.db.*;
+//import org.miniCassandra.db.compaction.AbstractCompactionStrategy;
+//import org.miniCassandra.db.marshal.*;
+//import org.miniCassandra.db.rows.RowIterator;
+//import org.miniCassandra.db.rows.UnfilteredRowIterators;
+//import org.miniCassandra.exceptions.InvalidRequestException;
+//import org.miniCassandra.utils.ByteBufferUtil;
+//import org.miniCassandra.utils.FBUtilities;
+//import org.miniCassandra.utils.concurrent.OpOrder;
 //
 //import static java.lang.String.format;
-//import static org.apache.cassandra.utils.ByteBufferUtil.bytes;
-//import static org.apache.cassandra.utils.FBUtilities.fromJsonMap;
+//import static org.miniCassandra.utils.ByteBufferUtil.bytes;
+//import static org.miniCassandra.utils.FBUtilities.fromJsonMap;
 //
 ///**
 // * This majestic class performs migration from legacy (pre-3.0) system.schema_* schema tables to the new and glorious
@@ -135,7 +135,7 @@
 //            systemTables = systemTables.without(table.cfName);
 //
 //        LegacySchemaTables.forEach(Schema.instance::unload);
-//        LegacySchemaTables.forEach((cfm) -> org.apache.cassandra.db.Keyspace.openAndGetStore(cfm).invalidate());
+//        LegacySchemaTables.forEach((cfm) -> org.miniCassandra.db.Keyspace.openAndGetStore(cfm).invalidate());
 //
 //        Schema.instance.setKeyspaceMetadata(systemKeyspace.withSwapped(systemTables));
 //    }
@@ -807,7 +807,7 @@
 //
 //    private static Triggers createTriggersFromTriggerRows(UntypedResultSet rows)
 //    {
-//        Triggers.Builder triggers = org.apache.cassandra.schema.Triggers.builder();
+//        Triggers.Builder triggers = org.miniCassandra.schema.Triggers.builder();
 //        rows.forEach(row -> triggers.add(createTriggerFromTriggerRow(row)));
 //        return triggers.build();
 //    }
@@ -849,7 +849,7 @@
 //     */
 //    private static long readTypeTimestamp(String keyspaceName, String typeName)
 //    {
-//        ColumnFamilyStore store = org.apache.cassandra.db.Keyspace.open(SystemKeyspace.NAME)
+//        ColumnFamilyStore store = org.miniCassandra.db.Keyspace.open(SystemKeyspace.NAME)
 //                                                                  .getColumnFamilyStore(SystemKeyspace.LEGACY_USERTYPES);
 //
 //        ClusteringComparator comparator = store.metadata.comparator;

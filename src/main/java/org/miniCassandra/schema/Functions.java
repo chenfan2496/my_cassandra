@@ -27,7 +27,7 @@
 //import static com.google.common.collect.Iterables.filter;
 //
 ///**
-// * An immutable container for a keyspace's UDAs and UDFs (and, in case of {@link org.apache.cassandra.db.SystemKeyspace},
+// * An immutable container for a keyspace's UDAs and UDFs (and, in case of {@link org.miniCassandra.db.SystemKeyspace},
 // * native functions and aggregates).
 // */
 //public final class Functions implements Iterable<Function>

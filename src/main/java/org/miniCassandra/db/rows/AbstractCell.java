@@ -18,6 +18,7 @@
 package org.miniCassandra.db.rows;
 
 import org.miniCassandra.config.ColumnDefinition;
+import org.miniCassandra.db.context.CounterContext;
 import org.miniCassandra.db.marshal.AbstractType;
 import org.miniCassandra.db.marshal.CollectionType;
 import org.miniCassandra.serializers.MarshalException;
@@ -40,23 +41,23 @@ public abstract class AbstractCell extends Cell
         super(column);
     }
 
-//    public void digest(MessageDigest digest)
-//    {
-//        if (isCounterCell())
-//        {
-//            CounterContext.instance().updateDigest(digest, value());
-//        }
-//        else
-//        {
-//            digest.update(value().duplicate());
-//        }
-//
-//        FBUtilities.updateWithLong(digest, timestamp());
-//        FBUtilities.updateWithInt(digest, ttl());
-//        FBUtilities.updateWithBoolean(digest, isCounterCell());
-//        if (path() != null)
-//            path().digest(digest);
-//    }
+    public void digest(MessageDigest digest)
+    {
+        if (isCounterCell())
+        {
+            CounterContext.instance().updateDigest(digest, value());
+        }
+        else
+        {
+            digest.update(value().duplicate());
+        }
+
+        FBUtilities.updateWithLong(digest, timestamp());
+        FBUtilities.updateWithInt(digest, ttl());
+        FBUtilities.updateWithBoolean(digest, isCounterCell());
+        if (path() != null)
+            path().digest(digest);
+    }
 
     public void validate()
     {
@@ -112,27 +113,27 @@ public abstract class AbstractCell extends Cell
         return Objects.hash(column(), isCounterCell(), timestamp(), ttl(), localDeletionTime(), value(), path());
     }
 
-//    @Override
-//    public String toString()
-//    {
-//        if (isCounterCell())
-//            return String.format("[%s=%d ts=%d]", column().name, CounterContext.instance().total(value()), timestamp());
-//
-//        AbstractType<?> type = column().type;
-//        if (type instanceof CollectionType && type.isMultiCell())
-//        {
-//            CollectionType ct = (CollectionType)type;
-//            return String.format("[%s[%s]=%s %s]",
-//                                 column().name,
-//                                 ct.nameComparator().getString(path().get(0)),
-//                                 ct.valueComparator().getString(value()),
-//                                 livenessInfoString());
-//        }
-//        if (isTombstone())
-//            return String.format("[%s=<tombstone> %s]", column().name, livenessInfoString());
-//        else
-//            return String.format("[%s=%s %s]", column().name, type.getString(value()), livenessInfoString());
-//    }
+    @Override
+    public String toString()
+    {
+        if (isCounterCell())
+            return String.format("[%s=%d ts=%d]", column().name, CounterContext.instance().total(value()), timestamp());
+
+        AbstractType<?> type = column().type;
+        if (type instanceof CollectionType && type.isMultiCell())
+        {
+            CollectionType ct = (CollectionType)type;
+            return String.format("[%s[%s]=%s %s]",
+                                 column().name,
+                                 ct.nameComparator().getString(path().get(0)),
+                                 ct.valueComparator().getString(value()),
+                                 livenessInfoString());
+        }
+        if (isTombstone())
+            return String.format("[%s=<tombstone> %s]", column().name, livenessInfoString());
+        else
+            return String.format("[%s=%s %s]", column().name, type.getString(value()), livenessInfoString());
+    }
 
     private String livenessInfoString()
     {

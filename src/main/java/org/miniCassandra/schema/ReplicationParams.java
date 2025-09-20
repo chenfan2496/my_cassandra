@@ -28,7 +28,7 @@
 //{
 //    public static final String CLASS = "class";
 //
-////    public final Class<? extends AbstractReplicationStrategy> klass;
+//    public final Class<? extends AbstractReplicationStrategy> klass;
 //    public final ImmutableMap<String, String> options;
 //    private ReplicationParams(Map<String, String> options)
 //    {
@@ -36,21 +36,21 @@
 //        this.options = ImmutableMap.copyOf(options);
 //    }
 //
-////    private ReplicationParams(Class<? extends AbstractReplicationStrategy> klass, Map<String, String> options)
-////    {
-////        this.klass = klass;
-////        this.options = ImmutableMap.copyOf(options);
-////    }
+//    private ReplicationParams(Class<? extends AbstractReplicationStrategy> klass, Map<String, String> options)
+//    {
+//        this.klass = klass;
+//        this.options = ImmutableMap.copyOf(options);
+//    }
 //
-////    static ReplicationParams local()
-////    {
-////        return new ReplicationParams(LocalStrategy.class, ImmutableMap.of());
-////    }
+//    static ReplicationParams local()
+//    {
+//        return new ReplicationParams(LocalStrategy.class, ImmutableMap.of());
+//    }
 //
-////    static ReplicationParams simple(int replicationFactor)
-////    {
-////        return new ReplicationParams(SimpleStrategy.class, ImmutableMap.of("replication_factor", Integer.toString(replicationFactor)));
-////    }
+//    static ReplicationParams simple(int replicationFactor)
+//    {
+//        return new ReplicationParams(SimpleStrategy.class, ImmutableMap.of("replication_factor", Integer.toString(replicationFactor)));
+//    }
 //
 //    static ReplicationParams nts(Object... args)
 //    {

@@ -1,15 +1,14 @@
 package org.miniCassandra.db.io.util;
 
+import org.miniCassandra.db.io.FSReadError;
 import org.miniCassandra.db.io.FSWriteError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.nio.ch.DirectBuffer;
 
-import java.io.DataInput;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
@@ -22,6 +21,9 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.StreamSupport;
+
+import static org.miniCassandra.utils.Throwables.maybeFail;
+import static org.miniCassandra.utils.Throwables.merge;
 
 public class FileUtils {
     public static final Charset CHARSET = StandardCharsets.UTF_8;
@@ -92,122 +94,122 @@ public class FileUtils {
         return createTempFile(prefix, suffix, new File(System.getProperty("java.io.tmpdir")));
     }
 
-//    public static Throwable deleteWithConfirm(String filePath, boolean expect, Throwable accumulate)
-//    {
-//        return deleteWithConfirm(new File(filePath), expect, accumulate);
-//    }
+    public static Throwable deleteWithConfirm(String filePath, boolean expect, Throwable accumulate)
+    {
+        return deleteWithConfirm(new File(filePath), expect, accumulate);
+    }
 
-//    public static Throwable deleteWithConfirm(File file, boolean expect, Throwable accumulate)
-//    {
-//        boolean exists = file.exists();
-//        assert exists || !expect : "attempted to delete non-existing file " + file.getName();
-//        try
-//        {
-//            if (exists)
-//                Files.delete(file.toPath());
-//        }
-//        catch (Throwable t)
-//        {
-//            try
-//            {
-//                //throw new FSWriteError(t, file);
-//            }
-//            catch (Throwable t2)
-//            {
-//                accumulate = merge(accumulate, t2);
-//            }
-//        }
-//        return accumulate;
-//    }
-//
-//    public static void deleteWithConfirm(String file)
-//    {
-//        deleteWithConfirm(new File(file));
-//    }
-//
-//    public static void deleteWithConfirm(File file)
-//    {
-//        maybeFail(deleteWithConfirm(file, true, null));
-//    }
-//
-//    public static void renameWithOutConfirm(String from, String to)
-//    {
-//        try
-//        {
-//            atomicMoveWithFallback(new File(from).toPath(), new File(to).toPath());
-//        }
-//        catch (IOException e)
-//        {
-//            if (logger.isTraceEnabled())
-//                logger.trace("Could not move file "+from+" to "+to, e);
-//        }
-//    }
+    public static Throwable deleteWithConfirm(File file, boolean expect, Throwable accumulate)
+    {
+        boolean exists = file.exists();
+        assert exists || !expect : "attempted to delete non-existing file " + file.getName();
+        try
+        {
+            if (exists)
+                Files.delete(file.toPath());
+        }
+        catch (Throwable t)
+        {
+            try
+            {
+                //throw new FSWriteError(t, file);
+            }
+            catch (Throwable t2)
+            {
+                accumulate = merge(accumulate, t2);
+            }
+        }
+        return accumulate;
+    }
 
-//    public static void renameWithConfirm(String from, String to)
-//    {
-//        renameWithConfirm(new File(from), new File(to));
-//    }
-//
-//    public static void renameWithConfirm(File from, File to)
-//    {
-//        assert from.exists();
-//        if (logger.isTraceEnabled())
-//            logger.trace((String.format("Renaming %s to %s", from.getPath(), to.getPath())));
-//        // this is not FSWE because usually when we see it it's because we didn't close the file before renaming it,
-//        // and Windows is picky about that.
-//        try
-//        {
-//            atomicMoveWithFallback(from.toPath(), to.toPath());
-//        }
-//        catch (IOException e)
-//        {
-//            throw new RuntimeException(String.format("Failed to rename %s to %s", from.getPath(), to.getPath()), e);
-//        }
-//    }
-//
-//    /**
-//     * Move a file atomically, if it fails, it falls back to a non-atomic operation
-//     * @param from
-//     * @param to
-//     * @throws IOException
-//     */
-//    private static void atomicMoveWithFallback(Path from, Path to) throws IOException
-//    {
-//        try
-//        {
-//            Files.move(from, to, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-//        }
-//        catch (AtomicMoveNotSupportedException e)
-//        {
-//            logger.trace("Could not do an atomic move", e);
-//            Files.move(from, to, StandardCopyOption.REPLACE_EXISTING);
-//        }
-//
-//    }
-//    public static void truncate(String path, long size)
-//    {
-//        try(FileChannel channel = FileChannel.open(Paths.get(path), StandardOpenOption.READ, StandardOpenOption.WRITE))
-//        {
-//            channel.truncate(size);
-//        }
-//        catch (IOException e)
-//        {
-//            throw new RuntimeException(e);
-//        }
-//    }
-//
-//    public static void closeQuietly(Closeable c)
-//    {
-//        try
-//        {
-//            if (c != null)
-//                c.close();
-//        }
-//        catch (Exception e)
-//        {
-//            logger.warn("Failed closing {}", c, e);
-//        }
-//    }
+    public static void deleteWithConfirm(String file)
+    {
+        deleteWithConfirm(new File(file));
+    }
+
+    public static void deleteWithConfirm(File file)
+    {
+        maybeFail(deleteWithConfirm(file, true, null));
+    }
+
+    public static void renameWithOutConfirm(String from, String to)
+    {
+        try
+        {
+            atomicMoveWithFallback(new File(from).toPath(), new File(to).toPath());
+        }
+        catch (IOException e)
+        {
+            if (logger.isTraceEnabled())
+                logger.trace("Could not move file "+from+" to "+to, e);
+        }
+    }
+
+    public static void renameWithConfirm(String from, String to)
+    {
+        renameWithConfirm(new File(from), new File(to));
+    }
+
+    public static void renameWithConfirm(File from, File to)
+    {
+        assert from.exists();
+        if (logger.isTraceEnabled())
+            logger.trace((String.format("Renaming %s to %s", from.getPath(), to.getPath())));
+        // this is not FSWE because usually when we see it it's because we didn't close the file before renaming it,
+        // and Windows is picky about that.
+        try
+        {
+            atomicMoveWithFallback(from.toPath(), to.toPath());
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(String.format("Failed to rename %s to %s", from.getPath(), to.getPath()), e);
+        }
+    }
+
+    /**
+     * Move a file atomically, if it fails, it falls back to a non-atomic operation
+     * @param from
+     * @param to
+     * @throws IOException
+     */
+    private static void atomicMoveWithFallback(Path from, Path to) throws IOException
+    {
+        try
+        {
+            Files.move(from, to, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        }
+        catch (AtomicMoveNotSupportedException e)
+        {
+            logger.trace("Could not do an atomic move", e);
+            Files.move(from, to, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+    }
+    public static void truncate(String path, long size)
+    {
+        try(FileChannel channel = FileChannel.open(Paths.get(path), StandardOpenOption.READ, StandardOpenOption.WRITE))
+        {
+            channel.truncate(size);
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void closeQuietly(Closeable c)
+    {
+        try
+        {
+            if (c != null)
+                c.close();
+        }
+        catch (Exception e)
+        {
+            logger.warn("Failed closing {}", c, e);
+        }
+    }
 
     public static void closeQuietly(AutoCloseable c)
     {
@@ -221,94 +223,94 @@ public class FileUtils {
             logger.warn("Failed closing {}", c, e);
         }
     }
-//
-//    public static void close(Closeable... cs) throws IOException
-//    {
-//        close(Arrays.asList(cs));
-//    }
-//
-//    public static void close(Iterable<? extends Closeable> cs) throws IOException
-//    {
-//        Throwable e = null;
-//        for (Closeable c : cs)
-//        {
-//            try
-//            {
-//                if (c != null)
-//                    c.close();
-//            }
-//            catch (Throwable ex)
-//            {
-//                if (e == null) e = ex;
-//                else e.addSuppressed(ex);
-//                logger.warn("Failed closing stream {}", c, ex);
-//            }
-//        }
-//        maybeFail(e, IOException.class);
-//    }
-//
-//    public static void closeQuietly(Iterable<? extends AutoCloseable> cs)
-//    {
-//        for (AutoCloseable c : cs)
-//        {
-//            try
-//            {
-//                if (c != null)
-//                    c.close();
-//            }
-//            catch (Exception ex)
-//            {
-//                logger.warn("Failed closing {}", c, ex);
-//            }
-//        }
-//    }
-//
-//    public static String getCanonicalPath(String filename)
-//    {
-//        try
-//        {
-//            return new File(filename).getCanonicalPath();
-//        }
-//        catch (IOException e)
-//        {
-//            throw new FSReadError(e, filename);
-//        }
-//    }
-//
-//    public static String getCanonicalPath(File file)
-//    {
-//        try
-//        {
-//            return file.getCanonicalPath();
-//        }
-//        catch (IOException e)
-//        {
-//            throw new FSReadError(e, file);
-//        }
-//    }
-//
-//    /** Return true if file is contained in folder */
-//    public static boolean isContained(File folder, File file)
-//    {
-//        Path folderPath = Paths.get(getCanonicalPath(folder));
-//        Path filePath = Paths.get(getCanonicalPath(file));
-//
-//        return filePath.startsWith(folderPath);
-//    }
-//
-//    /** Convert absolute path into a path relative to the base path */
-//    public static String getRelativePath(String basePath, String path)
-//    {
-//        try
-//        {
-//            return Paths.get(basePath).relativize(Paths.get(path)).toString();
-//        }
-//        catch(Exception ex)
-//        {
-//            String absDataPath = FileUtils.getCanonicalPath(basePath);
-//            return Paths.get(absDataPath).relativize(Paths.get(path)).toString();
-//        }
-//    }
+
+    public static void close(Closeable... cs) throws IOException
+    {
+        close(Arrays.asList(cs));
+    }
+
+    public static void close(Iterable<? extends Closeable> cs) throws IOException
+    {
+        Throwable e = null;
+        for (Closeable c : cs)
+        {
+            try
+            {
+                if (c != null)
+                    c.close();
+            }
+            catch (Throwable ex)
+            {
+                if (e == null) e = ex;
+                else e.addSuppressed(ex);
+                logger.warn("Failed closing stream {}", c, ex);
+            }
+        }
+        maybeFail(e, IOException.class);
+    }
+
+    public static void closeQuietly(Iterable<? extends AutoCloseable> cs)
+    {
+        for (AutoCloseable c : cs)
+        {
+            try
+            {
+                if (c != null)
+                    c.close();
+            }
+            catch (Exception ex)
+            {
+                logger.warn("Failed closing {}", c, ex);
+            }
+        }
+    }
+
+    public static String getCanonicalPath(String filename)
+    {
+        try
+        {
+            return new File(filename).getCanonicalPath();
+        }
+        catch (IOException e)
+        {
+            throw new FSReadError(e, filename);
+        }
+    }
+
+    public static String getCanonicalPath(File file)
+    {
+        try
+        {
+            return file.getCanonicalPath();
+        }
+        catch (IOException e)
+        {
+            throw new FSReadError(e, file);
+        }
+    }
+
+    /** Return true if file is contained in folder */
+    public static boolean isContained(File folder, File file)
+    {
+        Path folderPath = Paths.get(getCanonicalPath(folder));
+        Path filePath = Paths.get(getCanonicalPath(file));
+
+        return filePath.startsWith(folderPath);
+    }
+
+    /** Convert absolute path into a path relative to the base path */
+    public static String getRelativePath(String basePath, String path)
+    {
+        try
+        {
+            return Paths.get(basePath).relativize(Paths.get(path)).toString();
+        }
+        catch(Exception ex)
+        {
+            String absDataPath = FileUtils.getCanonicalPath(basePath);
+            return Paths.get(absDataPath).relativize(Paths.get(path)).toString();
+        }
+    }
 
     public static boolean isCleanerAvailable()
     {
@@ -422,23 +424,23 @@ public class FileUtils {
         }
     }
 
-//    /**
-//     * Deletes all files and subdirectories under "dir".
-//     * @param dir Directory to be deleted
-//     * @throws FSWriteError if any part of the tree cannot be deleted
-//     */
-//    public static void deleteRecursive(File dir)
-//    {
-//        if (dir.isDirectory())
-//        {
-//            String[] children = dir.list();
-//            for (String child : children)
-//                deleteRecursive(new File(dir, child));
-//        }
-//
-//        // The directory is now empty so now it can be smoked
-//        deleteWithConfirm(dir);
-//    }
+    /**
+     * Deletes all files and subdirectories under "dir".
+     * @param dir Directory to be deleted
+     * @throws FSWriteError if any part of the tree cannot be deleted
+     */
+    public static void deleteRecursive(File dir)
+    {
+        if (dir.isDirectory())
+        {
+            String[] children = dir.list();
+            for (String child : children)
+                deleteRecursive(new File(dir, child));
+        }
+
+        // The directory is now empty so now it can be smoked
+        deleteWithConfirm(dir);
+    }
 
     /**
      * Schedules deletion of all file and subdirectories under "dir" on JVM shutdown.
@@ -456,7 +458,7 @@ public class FileUtils {
         logger.trace("Scheduling deferred deletion of file: " + dir);
         dir.deleteOnExit();
     }
-
+//
 //    public static void handleCorruptSSTable(CorruptSSTableException e)
 //    {
 //        FSErrorHandler handler = fsErrorHandler.get();
@@ -470,7 +472,7 @@ public class FileUtils {
 //        if (handler != null)
 //            handler.handleFSError(e);
 //    }
-
+//
 //    /**
 //     * handleFSErrorAndPropagate will invoke the disk failure policy error handler,
 //     * which may or may not stop the daemon or transports. However, if we don't exit,

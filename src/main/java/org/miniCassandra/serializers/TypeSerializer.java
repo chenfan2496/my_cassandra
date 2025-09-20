@@ -20,6 +20,11 @@ package org.miniCassandra.serializers;
 
 import java.nio.ByteBuffer;
 
+/**
+ * serialize a type of T object into a bytebuffer
+ * or deserialize a type of object into type T
+ * @param <T>
+ */
 public interface TypeSerializer<T>
 {
     public ByteBuffer serialize(T value);

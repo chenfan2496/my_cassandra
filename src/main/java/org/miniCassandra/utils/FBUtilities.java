@@ -491,28 +491,28 @@ public class FBUtilities
     public static IPartitioner newPartitioner(String partitionerClassName) throws ConfigurationException
     {
         if (!partitionerClassName.contains("."))
-            partitionerClassName = "org.apache.cassandra.dht." + partitionerClassName;
+            partitionerClassName = "org.miniCassandra.dht." + partitionerClassName;
         return FBUtilities.instanceOrConstruct(partitionerClassName, "partitioner");
     }
 
 //    public static IAuthorizer newAuthorizer(String className) throws ConfigurationException
 //    {
 //        if (!className.contains("."))
-//            className = "org.apache.cassandra.auth." + className;
+//            className = "org.miniCassandra.auth." + className;
 //        return FBUtilities.construct(className, "authorizer");
 //    }
 //
 //    public static IAuthenticator newAuthenticator(String className) throws ConfigurationException
 //    {
 //        if (!className.contains("."))
-//            className = "org.apache.cassandra.auth." + className;
+//            className = "org.miniCassandra.auth." + className;
 //        return FBUtilities.construct(className, "authenticator");
 //    }
 //
 //    public static IRoleManager newRoleManager(String className) throws ConfigurationException
 //    {
 //        if (!className.contains("."))
-//            className = "org.apache.cassandra.auth." + className;
+//            className = "org.miniCassandra.auth." + className;
 //        return FBUtilities.construct(className, "role manager");
 //    }
 

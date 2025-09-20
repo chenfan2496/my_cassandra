@@ -836,7 +836,7 @@ public class DatabaseDescriptor
 //    private static IEndpointSnitch createEndpointSnitch(String snitchClassName) throws ConfigurationException
 //    {
 //        if (!snitchClassName.contains("."))
-//            snitchClassName = "org.apache.cassandra.locator." + snitchClassName;
+//            snitchClassName = "org.miniCassandra.locator." + snitchClassName;
 //        IEndpointSnitch snitch = FBUtilities.construct(snitchClassName, "snitch");
 //        return conf.dynamic_snitch ? new DynamicEndpointSnitch(snitch) : snitch;
 //    }

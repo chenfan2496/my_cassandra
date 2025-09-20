@@ -16,8 +16,11 @@
  * limitations under the License.
  */
 package org.miniCassandra.schema;
+import com.google.common.base.Functions;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
+import com.google.common.collect.Iterables;
+import org.miniCassandra.config.CFMetaData;
 
 
 /**
@@ -43,15 +46,15 @@ public final class KeyspaceMetadata
     }
 
 
-//    private KeyspaceMetadata(String name, KeyspaceParams params, Tables tables,  Types types, Functions functions)
-//    {
-//        this.name = name;
-//        this.params = params;
-//        this.tables = tables;
-//        //this.views = views;
-//        this.types = types;
-//       // this.functions = functions;
-//    }
+    private KeyspaceMetadata(String name, KeyspaceParams params, Tables tables,  Types types, Functions functions)
+    {
+        this.name = name;
+        this.params = params;
+        this.tables = tables;
+        //this.views = views;
+        this.types = types;
+       // this.functions = functions;
+    }
 
     public static KeyspaceMetadata create(String name, KeyspaceParams params)
     {
@@ -63,10 +66,10 @@ public final class KeyspaceMetadata
         return new KeyspaceMetadata(name, params, tables, Types.none());
     }
 
-//    public static KeyspaceMetadata create(String name, KeyspaceParams params, Tables tables, Types types, Functions functions)
-//    {
-//        return new KeyspaceMetadata(name, params, tables, types, functions);
-//    }
+    public static KeyspaceMetadata create(String name, KeyspaceParams params, Tables tables, Types types, Functions functions)
+    {
+        return new KeyspaceMetadata(name, params, tables, types, functions);
+    }
 
     public static KeyspaceMetadata create(String name, KeyspaceParams params, Tables tables, Types types)
     {
@@ -82,7 +85,7 @@ public final class KeyspaceMetadata
 //    {
 //        return new KeyspaceMetadata(name, params, regular, views, types, functions);
 //    }
-
+//
 //    public KeyspaceMetadata withSwapped(Views views)
 //    {
 //        return new KeyspaceMetadata(name, params, tables, types, functions);
@@ -93,16 +96,16 @@ public final class KeyspaceMetadata
         return new KeyspaceMetadata(name, params, tables,types);
     }
 
-//    public KeyspaceMetadata withSwapped(Functions functions)
-//    {
-//        return new KeyspaceMetadata(name, params, tables, types, functions);
-//    }
+    public KeyspaceMetadata withSwapped(Functions functions)
+    {
+        return new KeyspaceMetadata(name, params, tables, types, functions);
+    }
 
 //    public Iterable<CFMetaData> tablesAndViews()
 //    {
 //        return Iterables.concat(tables, views.metadatas());
 //    }
-
+//
 //    @Nullable
 //    public CFMetaData getTableOrViewNullable(String tableOrViewName)
 //    {
@@ -111,7 +114,7 @@ public final class KeyspaceMetadata
 //             ? tables.getNullable(tableOrViewName)
 //             : view.metadata;
 //    }
-
+//
 //    public Set<String> existingIndexNames(String cfToExclude)
 //    {
 //        Set<String> indexNames = new HashSet<>();
@@ -121,7 +124,7 @@ public final class KeyspaceMetadata
 //                    indexNames.add(index.name);
 //        return indexNames;
 //    }
-
+//
 //    public Optional<CFMetaData> findIndexedTable(String indexName)
 //    {
 //        for (CFMetaData cfm : tablesAndViews())

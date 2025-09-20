@@ -24,9 +24,11 @@ import java.util.function.BiFunction;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
+import org.miniCassandra.config.CFMetaData;
 import org.miniCassandra.config.ColumnDefinition;
 import org.miniCassandra.db.DeletionPurger;
 import org.miniCassandra.db.DeletionTime;
+import org.miniCassandra.db.filter.ColumnFilter;
 import org.miniCassandra.db.marshal.ByteType;
 import org.miniCassandra.utils.ObjectSizes;
 import org.miniCassandra.utils.btree.BTree;
@@ -140,20 +142,20 @@ public class ComplexColumnData extends ColumnData implements Iterable<Cell>
         return transformAndFilter(complexDeletion, Cell::markCounterLocalToBeCleared);
     }
 
-//    public ComplexColumnData filter(ColumnFilter filter, DeletionTime activeDeletion, CFMetaData.DroppedColumn dropped)
-//    {
-//        ColumnFilter.Tester cellTester = filter.newTester(column);
-//        if (cellTester == null && activeDeletion.isLive() && dropped == null)
-//            return this;
-//
-//        DeletionTime newDeletion = activeDeletion.supersedes(complexDeletion) ? DeletionTime.LIVE : complexDeletion;
-//        return transformAndFilter(newDeletion,
-//                                  (cell) ->
-//                                           (cellTester == null || cellTester.includes(cell.path()))
-//                                        && !activeDeletion.deletes(cell)
-//                                        && (dropped == null || cell.timestamp() > dropped.droppedTime)
-//                                           ? cell : null);
-//    }
+    public ComplexColumnData filter(ColumnFilter filter, DeletionTime activeDeletion, CFMetaData.DroppedColumn dropped)
+    {
+        ColumnFilter.Tester cellTester = filter.newTester(column);
+        if (cellTester == null && activeDeletion.isLive() && dropped == null)
+            return this;
+
+        DeletionTime newDeletion = activeDeletion.supersedes(complexDeletion) ? DeletionTime.LIVE : complexDeletion;
+        return transformAndFilter(newDeletion,
+                                  (cell) ->
+                                           (cellTester == null || cellTester.includes(cell.path()))
+                                        && !activeDeletion.deletes(cell)
+                                        && (dropped == null || cell.timestamp() > dropped.droppedTime)
+                                           ? cell : null);
+    }
 
     public ComplexColumnData purge(DeletionPurger purger, int nowInSec)
     {

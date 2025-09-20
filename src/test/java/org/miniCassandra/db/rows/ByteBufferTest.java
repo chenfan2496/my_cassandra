@@ -1,6 +1,4 @@
 package org.miniCassandra.db.rows;
 
-
-public class CellTest {
-
+public class ByteBufferTest {
 }

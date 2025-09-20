@@ -17,10 +17,12 @@
  */
 package org.miniCassandra.db.rows;
 
+import org.miniCassandra.db.DeletionInfo;
 import org.miniCassandra.db.DeletionTime;
 import org.miniCassandra.db.TypeSizes;
 import org.miniCassandra.db.io.util.DataInputPlus;
 import org.miniCassandra.db.io.util.DataOutputPlus;
+import org.miniCassandra.db.partitions.PartitionStatisticsCollector;
 
 import java.io.IOException;
 import java.util.*;
@@ -157,8 +159,7 @@ public class EncodingStats
         return String.format("EncodingStats(ts=%d, ldt=%d, ttl=%d)", minTimestamp, minLocalDeletionTime, minTTL);
     }
 
-    //public static class Collector implements PartitionStatisticsCollector
-    public static class Collector
+    public static class Collector implements PartitionStatisticsCollector
     {
         private boolean isTimestampSet;
         private long minTimestamp = Long.MAX_VALUE;
@@ -239,17 +240,17 @@ public class EncodingStats
                                      isDelTimeSet ? minDeletionTime : DELETION_TIME_EPOCH,
                                      isTTLSet ? minTTL : TTL_EPOCH);
         }
-//
-//        public static EncodingStats collect(Row staticRow, Iterator<Row> rows, DeletionInfo deletionInfo)
-//        {
-//            Collector collector = new Collector();
-//            deletionInfo.collectStats(collector);
-//            if (!staticRow.isEmpty())
-//                Rows.collectStats(staticRow, collector);
-//            while (rows.hasNext())
-//                Rows.collectStats(rows.next(), collector);
-//            return collector.get();
-//        }
+
+        public static EncodingStats collect(Row staticRow, Iterator<Row> rows, DeletionInfo deletionInfo)
+        {
+            Collector collector = new Collector();
+            deletionInfo.collectStats(collector);
+            if (!staticRow.isEmpty())
+                Rows.collectStats(staticRow, collector);
+            while (rows.hasNext())
+                Rows.collectStats(rows.next(), collector);
+            return collector.get();
+        }
     }
 
     public static class Serializer

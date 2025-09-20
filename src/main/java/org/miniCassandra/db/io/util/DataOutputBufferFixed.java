@@ -55,7 +55,7 @@ public class DataOutputBufferFixed extends DataOutputBuffer
     /*
      * Not currently reachable (all paths hit doFLush first), but in the spirit of things this should throw
      * if it is called.
-     * @see org.apache.cassandra.io.util.DataOutputBuffer#reallocate(long)
+     * @see org.miniCassandra.io.util.DataOutputBuffer#reallocate(long)
      */
     @Override
     protected void expandToFit(long newSize)

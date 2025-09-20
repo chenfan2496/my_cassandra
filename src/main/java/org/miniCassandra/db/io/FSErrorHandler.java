@@ -18,7 +18,7 @@
 //
 //package org.frantz.mycassandra.db.io;
 //
-//import org.apache.cassandra.io.sstable.CorruptSSTableException;
+//import org.miniCassandra.io.sstable.CorruptSSTableException;
 //
 ///**
 // * Interface for handling file system errors.

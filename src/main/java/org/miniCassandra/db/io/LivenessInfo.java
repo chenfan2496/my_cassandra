@@ -48,7 +48,7 @@ public class LivenessInfo
      * Used as flag for representing an expired liveness.
      *
      * TTL per request is at most 20 yrs, so this shouldn't conflict
-     * (See {@link org.apache.cassandra.cql3.Attributes#MAX_TTL})
+     * (See {@link org.miniCassandra.cql3.Attributes#MAX_TTL})
      */
     public static final int EXPIRED_LIVENESS_TTL = Integer.MAX_VALUE;
     public static final int NO_EXPIRATION_TIME = Cell.NO_DELETION_TIME;

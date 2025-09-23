@@ -86,8 +86,8 @@ public class BTreeTest {
 
     @Test
     public void testBuildBTree() {
-       List<Integer> buildList = seq(36);
+       List<Integer> buildList = seq(10000);
        Object[] btree =  BTree.build(buildList,updateF);
-       assertEquals(Optional.of(10).get(),BTree.find(btree,Comparator.naturalOrder(),10));
+       assertEquals(Optional.of(500).get(),BTree.find(btree,Comparator.naturalOrder(),1000010));
     }
 }

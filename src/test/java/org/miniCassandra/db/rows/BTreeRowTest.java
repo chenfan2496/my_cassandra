@@ -18,10 +18,7 @@ import org.miniCassandra.utils.btree.BTree;
 import org.miniCassandra.utils.btree.UpdateFunction;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -69,7 +66,7 @@ public class BTreeRowTest {
     // 1. 空行测试
     @Test
     public void testEmptyRow() {
-        BTreeRow row = BTreeRow.create(clustering, LivenessInfo.EMPTY, Row.Deletion.LIVE,BTree.build(createCells(100), UpdateFunction.noOp()));
+        BTreeRow row = BTreeRow.create(clustering, LivenessInfo.EMPTY, Row.Deletion.LIVE,BTree.build(createCells(1000), UpdateFunction.<Cell>noOp()));
         ColumnDefinition columnDefinition = createColumnDefinition("column2",Int32Type.instance);
         Cell cell = row.getCell(columnDefinition);
         System.out.println(ByteBufferUtil.toInt(row.getCell(createColumnDefinition("2",Int32Type.instance)).value()));

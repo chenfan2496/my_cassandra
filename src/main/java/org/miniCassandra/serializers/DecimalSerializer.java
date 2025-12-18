@@ -45,8 +45,9 @@ public class DecimalSerializer implements TypeSerializer<BigDecimal>
     @Override
     public ByteBuffer serialize(BigDecimal value)
     {
-        if (value == null)
+        if (value == null) {
             return ByteBufferUtil.EMPTY_BYTE_BUFFER;
+        }
 
         BigInteger bi = value.unscaledValue();
         int scale = value.scale();

@@ -31,8 +31,9 @@ public class BooleanSerializer implements TypeSerializer<Boolean>
     @Override
     public Boolean deserialize(ByteBuffer bytes)
     {
-        if (bytes == null || bytes.remaining() == 0)
+        if (bytes == null || bytes.remaining() == 0) {
             return null;
+        }
 
         byte value = bytes.get(bytes.position());
         return value != 0;
@@ -46,8 +47,9 @@ public class BooleanSerializer implements TypeSerializer<Boolean>
     @Override
     public void validate(ByteBuffer bytes) throws MarshalException
     {
-        if (bytes.remaining() != 1 && bytes.remaining() != 0)
+        if (bytes.remaining() != 1 && bytes.remaining() != 0) {
             throw new MarshalException(String.format("Expected 1 or 0 byte value (%d)", bytes.remaining()));
+        }
     }
     @Override
     public String toString(Boolean value)

@@ -66,8 +66,9 @@ public abstract class CollectionSerializer<T> implements TypeSerializer<T>
 
         ByteBuffer result = ByteBuffer.allocate(sizeOfCollectionSize(elements, version) + size);
         writeCollectionSize(result, elements, version);
-        for (ByteBuffer bb : buffers)
+        for (ByteBuffer bb : buffers) {
             writeValue(result, bb, version);
+        }
         return (ByteBuffer)result.flip();
     }
 
